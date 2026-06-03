@@ -1,0 +1,28 @@
+@{
+    ViewData["Title"] = "Dashboard Staff";
+}
+
+<div class="p-4 mb-4 bg-info text-dark rounded-3">
+    <h1 class="display-6">Staff — @(ViewBag.FullName ?? ViewBag.Username)</h1>
+    <p class="mb-0">Nhánh <strong>Công ty</strong> — Khai báo chi tiêu chờ duyệt</p>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card border-info h-100">
+            <div class="card-body">
+                <h5 class="card-title">Vai trò</h5>
+                <p class="card-text"><span class="badge bg-info text-dark">Staff</span></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Lưu ý</h5>
+                <p>Khai báo công tác phí qua pop-up. Khoản đã <strong>Approved</strong> không được sửa/xóa.</p>
+                <p class="text-muted mb-0">Email: @ViewBag.Email</p>
+            </div>
+        </div>
+    </div>
+</div>

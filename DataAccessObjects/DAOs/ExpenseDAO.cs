@@ -1,0 +1,74 @@
+using BusinessObjects.Enums;
+using BusinessObjects.Models;
+using DataAccessObjects.Context;
+using Microsoft.EntityFrameworkCore;
+
+namespace DataAccessObjects.DAOs
+{
+    public sealed class ExpenseDAO
+    {
+        private static ExpenseDAO? _instance;
+        private static readonly object _lock = new();
+
+        private ExpenseDAO() { }
+
+        public static ExpenseDAO Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    lock (_lock)
+                    {
+                        _instance ??= new ExpenseDAO();
+                    }
+                }
+                return _instance;
+            }
+        }
+
+        public IQueryable<Expense> GetQueryable(ExpenseDbContext context) =>
+            context.Expenses
+                .Include(e => e.Category)
+                .Include(e => e.User)
+                .AsNoTracking();
+
+        public async Task<Expense?> GetByIdAsync(ExpenseDbContext context, int id) =>
+            await context.Expenses
+                .Include(e => e.Category)
+                .Include(e => e.User)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+        public async Task AddAsync(ExpenseDbContext context, Expense expense)
+        {
+            await context.Expenses.AddAsync(expense);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(ExpenseDbContext context, Expense expense)
+        {
+            context.Expenses.Update(expense);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(ExpenseDbContext context, Expense expense)
+        {
+            context.Expenses.Remove(expense);
+            await context.SaveChangesAsync();
+        }
+
+        /// <summary>Nhánh 1: chỉ chi tiêu của chính User.</summary>
+        public IQueryable<Expense> ForPersonalUser(ExpenseDbContext context, int userId) =>
+            GetQueryable(context).Where(e => e.UserId == userId);
+
+        /// <summary>Nhánh 2 Staff: chỉ chi tiêu của Staff đó.</summary>
+        public IQueryable<Expense> ForStaff(ExpenseDbContext context, int staffId) =>
+            GetQueryable(context).Where(e => e.UserId == staffId);
+
+        /// <summary>Nhánh 2 Admin: toàn bộ chi tiêu Staff thuộc workspace.</summary>
+        public IQueryable<Expense> ForAdminWorkspace(ExpenseDbContext context, int adminId) =>
+            GetQueryable(context).Where(e =>
+                e.User.Role == UserRole.Staff &&
+                e.User.ParentAdminId == adminId);
+    }
+}

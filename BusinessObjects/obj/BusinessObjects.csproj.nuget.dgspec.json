@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\letha\\OneDrive\\Documents\\Ky8\\PRN232\\ExpenseManagement\\BusinessObjects\\BusinessObjects.csproj": {}
+    "C:\\Users\\I'm TLong\\Downloads\\ExpenseManagement\\ExpenseManagement\\BusinessObjects\\BusinessObjects.csproj": {}
   },
   "projects": {
-    "C:\\Users\\letha\\OneDrive\\Documents\\Ky8\\PRN232\\ExpenseManagement\\BusinessObjects\\BusinessObjects.csproj": {
+    "C:\\Users\\I'm TLong\\Downloads\\ExpenseManagement\\ExpenseManagement\\BusinessObjects\\BusinessObjects.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\letha\\OneDrive\\Documents\\Ky8\\PRN232\\ExpenseManagement\\BusinessObjects\\BusinessObjects.csproj",
+        "projectUniqueName": "C:\\Users\\I'm TLong\\Downloads\\ExpenseManagement\\ExpenseManagement\\BusinessObjects\\BusinessObjects.csproj",
         "projectName": "BusinessObjects",
-        "projectPath": "C:\\Users\\letha\\OneDrive\\Documents\\Ky8\\PRN232\\ExpenseManagement\\BusinessObjects\\BusinessObjects.csproj",
-        "packagesPath": "C:\\Users\\letha\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\letha\\OneDrive\\Documents\\Ky8\\PRN232\\ExpenseManagement\\BusinessObjects\\obj\\",
+        "projectPath": "C:\\Users\\I'm TLong\\Downloads\\ExpenseManagement\\ExpenseManagement\\BusinessObjects\\BusinessObjects.csproj",
+        "packagesPath": "C:\\Users\\I'm TLong\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\I'm TLong\\Downloads\\ExpenseManagement\\ExpenseManagement\\BusinessObjects\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\letha\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\I'm TLong\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,11 +26,11 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
+            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {}
           }
@@ -45,10 +45,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.300"
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "imports": [
             "net461",
@@ -61,12 +62,26 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.27, 8.0.27]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.27, 8.0.27]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.27, 8.0.27]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

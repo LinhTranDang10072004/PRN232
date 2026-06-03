@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "UeSHmgqv9R0=",
+  "dgSpecHash": "K7KlxH+/WzU=",
   "success": true,
-  "projectFilePath": "C:\\Users\\letha\\OneDrive\\Documents\\Ky8\\PRN232\\ExpenseManagement\\ClientMVC\\ClientMVC.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\I'm TLong\\Downloads\\ExpenseManagement\\ExpenseManagement\\ClientMVC\\ClientMVC.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\I'm TLong\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.27\\microsoft.windowsdesktop.app.ref.8.0.27.nupkg.sha512",
+    "C:\\Users\\I'm TLong\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.27\\microsoft.netcore.app.ref.8.0.27.nupkg.sha512",
+    "C:\\Users\\I'm TLong\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.27\\microsoft.aspnetcore.app.ref.8.0.27.nupkg.sha512",
+    "C:\\Users\\I'm TLong\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\8.0.27\\microsoft.netcore.app.host.win-x64.8.0.27.nupkg.sha512"
+  ],
   "logs": []
 }

@@ -1,32 +1,30 @@
-using ClientMVC.Models;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace ClientMVC.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
         public IActionResult Index()
         {
-            return View();
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return User.FindFirstValue(ClaimTypes.Role) switch
+                {
+                    "User" => RedirectToAction("Index", "Dashboard", new { area = "Personal" }),
+                    "Admin" => RedirectToAction("Dashboard", "Admin", new { area = "Corporate" }),
+                    "Staff" => RedirectToAction("Dashboard", "Staff", new { area = "Corporate" }),
+                    _ => RedirectToAction("Login", "Auth")
+                };
+            }
+
+            return RedirectToAction("Login", "Auth");
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        public IActionResult Privacy() => View();
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        public IActionResult Error() =>
+            View(new Models.ErrorViewModel { RequestId = System.Diagnostics.Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }

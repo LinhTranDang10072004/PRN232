@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "xi5XuxQVc6g=",
+  "dgSpecHash": "542ts6ZEIjk=",
   "success": true,
-  "projectFilePath": "C:\\Users\\letha\\OneDrive\\Documents\\Ky8\\PRN232\\ExpenseManagement\\BusinessObjects\\BusinessObjects.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\I'm TLong\\Downloads\\ExpenseManagement\\ExpenseManagement\\BusinessObjects\\BusinessObjects.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\I'm TLong\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.27\\microsoft.windowsdesktop.app.ref.8.0.27.nupkg.sha512",
+    "C:\\Users\\I'm TLong\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.27\\microsoft.netcore.app.ref.8.0.27.nupkg.sha512",
+    "C:\\Users\\I'm TLong\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.27\\microsoft.aspnetcore.app.ref.8.0.27.nupkg.sha512"
+  ],
   "logs": []
 }

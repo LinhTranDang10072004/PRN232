@@ -1,0 +1,31 @@
+@{
+    ViewData["Title"] = "Dashboard cá nhân";
+}
+
+<div class="p-4 mb-4 bg-primary text-white rounded-3">
+    <h1 class="display-6">Xin chào, @(ViewBag.FullName ?? ViewBag.Username)!</h1>
+    <p class="mb-0">Nhánh <strong>User</strong> — Quản lý ví chi tiêu cá nhân</p>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card border-success h-100">
+            <div class="card-body">
+                <h5 class="card-title">Vai trò</h5>
+                <p class="card-text"><span class="badge bg-success">User</span></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Thông tin tài khoản</h5>
+                <ul class="list-unstyled mb-0">
+                    <li><strong>Username:</strong> @ViewBag.Username</li>
+                    <li><strong>Email:</strong> @ViewBag.Email</li>
+                </ul>
+                <p class="text-muted mt-3 mb-0">Bước tiếp: CRUD chi tiêu (pop-up) — sẽ triển khai ở phase sau.</p>
+            </div>
+        </div>
+    </div>
+</div>
