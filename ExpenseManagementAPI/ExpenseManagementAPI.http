@@ -1,6 +1,92 @@
-@ExpenseManagementAPI_HostAddress = http://localhost:5141
+@ExpenseManagementAPI_HostAddress = https://localhost:7242
+@token = {{login.response.body.token}}
 
-GET {{ExpenseManagementAPI_HostAddress}}/weatherforecast/
-Accept: application/json
+### Đăng ký User (Nhánh 1)
+# @name register
+POST {{ExpenseManagementAPI_HostAddress}}/api/auth/register
+Content-Type: application/json
 
-###
+{
+  "username": "user_demo",
+  "password": "User@123",
+  "email": "user_demo@example.com",
+  "fullName": "Nguyễn Văn A"
+}
+
+### Đăng nhập User
+# @name login
+POST {{ExpenseManagementAPI_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user_demo",
+  "password": "User@123"
+}
+
+### Danh mục cá nhân + OData
+GET {{ExpenseManagementAPI_HostAddress}}/api/personal/categories?$filter=contains(Name,'ăn')&$orderby=Name&$count=true
+Authorization: Bearer {{token}}
+
+### Chi tiết danh mục
+GET {{ExpenseManagementAPI_HostAddress}}/api/personal/categories/1
+Authorization: Bearer {{token}}
+
+### Thêm danh mục (của tôi)
+POST {{ExpenseManagementAPI_HostAddress}}/api/personal/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Học phí"
+}
+
+### Sửa danh mục (chỉ danh mục tự tạo)
+PUT {{ExpenseManagementAPI_HostAddress}}/api/personal/categories/15
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Học phí (cập nhật)"
+}
+
+### Xóa danh mục (chỉ danh mục tự tạo, chưa dùng trong chi tiêu)
+DELETE {{ExpenseManagementAPI_HostAddress}}/api/personal/categories/15
+Authorization: Bearer {{token}}
+
+### Danh sách chi tiêu + OData
+GET {{ExpenseManagementAPI_HostAddress}}/api/personal/expenses?$filter=Amount gt 50000&$orderby=ExpenseDate desc&$top=10&$count=true
+Authorization: Bearer {{token}}
+
+### Chi tiết một khoản
+GET {{ExpenseManagementAPI_HostAddress}}/api/personal/expenses/1
+Authorization: Bearer {{token}}
+
+### Thêm khoản chi
+POST {{ExpenseManagementAPI_HostAddress}}/api/personal/expenses
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Cơm trưa",
+  "description": "Canteen",
+  "amount": 45000,
+  "expenseDate": "2026-06-03T12:00:00",
+  "categoryId": 1
+}
+
+### Sửa khoản chi
+PUT {{ExpenseManagementAPI_HostAddress}}/api/personal/expenses/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Cơm trưa (cập nhật)",
+  "description": "Canteen",
+  "amount": 50000,
+  "expenseDate": "2026-06-03T12:00:00",
+  "categoryId": 1
+}
+
+### Xóa khoản chi
+DELETE {{ExpenseManagementAPI_HostAddress}}/api/personal/expenses/1
+Authorization: Bearer {{token}}

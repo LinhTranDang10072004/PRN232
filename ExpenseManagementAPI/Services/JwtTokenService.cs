@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using BusinessObjects.Models;
+using ExpenseManagementAPI.Services.Interface;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ExpenseManagementAPI.Services

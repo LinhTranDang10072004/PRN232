@@ -1,6 +1,7 @@
 using BusinessObjects.Enums;
 using BusinessObjects.Models;
 using DataAccessObjects.Context;
+using ExpenseManagementAPI.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseManagementAPI.Services

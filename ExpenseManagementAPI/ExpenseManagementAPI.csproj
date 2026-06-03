@@ -27,4 +27,8 @@
     <ProjectReference Include="..\Repositories\Repositories.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Implement\" />
+  </ItemGroup>
+
 </Project>

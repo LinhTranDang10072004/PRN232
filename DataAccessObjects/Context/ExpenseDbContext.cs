@@ -35,7 +35,18 @@ namespace DataAccessObjects.Context
             modelBuilder.Entity<Category>(entity =>
             {
                 entity.Property(c => c.Name).HasMaxLength(100);
-                entity.HasIndex(c => new { c.Name, c.Branch }).IsUnique();
+                entity.HasIndex(c => new { c.Name, c.Branch, c.OwnerUserId })
+                    .IsUnique()
+                    .HasFilter("[OwnerUserId] IS NOT NULL");
+
+                entity.HasIndex(c => new { c.Name, c.Branch })
+                    .IsUnique()
+                    .HasFilter("[OwnerUserId] IS NULL");
+
+                entity.HasOne(c => c.OwnerUser)
+                    .WithMany()
+                    .HasForeignKey(c => c.OwnerUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Expense>(entity =>

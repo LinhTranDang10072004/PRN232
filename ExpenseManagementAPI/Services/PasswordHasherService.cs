@@ -1,3 +1,5 @@
+using ExpenseManagementAPI.Services.Interface;
+
 namespace ExpenseManagementAPI.Services
 {
     public class PasswordHasherService : IPasswordHasherService
