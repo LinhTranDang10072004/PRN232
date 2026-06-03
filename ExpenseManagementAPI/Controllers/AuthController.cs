@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using ExpenseManagementAPI.DTOs.Auth;
-using ExpenseManagementAPI.Services;
+using ExpenseManagementAPI.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

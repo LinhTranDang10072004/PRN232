@@ -4,6 +4,7 @@ using DataAccessObjects.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessObjects.Migrations
 {
     [DbContext(typeof(ExpenseDbContext))]
-    partial class ExpenseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260603151132_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,16 +92,10 @@ namespace DataAccessObjects.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("OwnerUserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerUserId");
-
-                    b.HasIndex("Name", "Branch", "OwnerUserId")
-                        .IsUnique()
-                        .HasFilter("[OwnerUserId] IS NOT NULL");
+                    b.HasIndex("Name", "Branch")
+                        .IsUnique();
 
                     b.ToTable("Categories");
 
@@ -233,16 +230,6 @@ namespace DataAccessObjects.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ParentAdmin");
-                });
-
-            modelBuilder.Entity("BusinessObjects.Models.Category", b =>
-                {
-                    b.HasOne("BusinessObjects.Models.AppUser", "OwnerUser")
-                        .WithMany()
-                        .HasForeignKey("OwnerUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("OwnerUser");
                 });
 
             modelBuilder.Entity("BusinessObjects.Models.Expense", b =>

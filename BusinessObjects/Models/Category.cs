@@ -16,6 +16,11 @@ namespace BusinessObjects.Models
         [Required]
         public CategoryBranch Branch { get; set; }
 
+        /// <summary>null = danh mục hệ thống (seed). Có giá trị = User tự tạo.</summary>
+        public int? OwnerUserId { get; set; }
+
+        public AppUser? OwnerUser { get; set; }
+
         public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
     }
 }

@@ -1,0 +1,177 @@
+@model ClientMVC.Models.Personal.ExpenseIndexViewModel
+@{
+    ViewData["Title"] = "Chi tiêu của tôi";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Chi tiêu</h2>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#expenseModal"
+            onclick="clearExpenseForm()">+ Thêm</button>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="alert alert-success">@Model.SuccessMessage</div>
+}
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Tìm tên</label>
+                <input name="filterKeyword" value="@Model.FilterKeyword" class="form-control" placeholder="VD: cơm" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Số tiền tối thiểu</label>
+                <input name="filterMinAmount" value="@Model.FilterMinAmount" type="number" step="1000" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Danh mục</label>
+                <select name="filterCategoryId" class="form-select">
+                    <option value="">-- Tất cả --</option>
+                    @foreach (var c in Model.Categories)
+                    {
+                        if (Model.FilterCategoryId == c.Id)
+                        {
+                            <option value="@c.Id" selected="selected">@c.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@c.Id">@c.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary w-100">Lọc (OData)</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Ngày</th>
+                <th>Tên</th>
+                <th>Danh mục</th>
+                <th class="text-end">Số tiền</th>
+                <th style="width:140px"></th>
+            </tr>
+        </thead>
+        <tbody>
+        @if (Model.Items.Count == 0)
+        {
+            <tr><td colspan="5" class="text-center text-muted">Chưa có khoản chi nào.</td></tr>
+        }
+        @foreach (var e in Model.Items)
+        {
+            <tr>
+                <td>@e.ExpenseDate.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <strong>@e.Title</strong>
+                    @if (!string.IsNullOrWhiteSpace(e.Description))
+                    {
+                        <br /><small class="text-muted">@e.Description</small>
+                    }
+                </td>
+                <td>@e.CategoryName</td>
+                <td class="text-end">@e.Amount.ToString("N0") đ</td>
+                <td>
+                    <a asp-action="Index" asp-route-editId="@e.Id" class="btn btn-sm btn-outline-secondary">Sửa</a>
+                    <form asp-action="Delete" asp-route-id="@e.Id" method="post" class="d-inline"
+                          onsubmit="return confirm('Xóa khoản chi này?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="expenseModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="expenseForm" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="expenseModalTitle">Thêm khoản chi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" name="Id" id="expenseId" value="@Model.Form.Id" />
+                    <div class="mb-2">
+                        <label class="form-label">Tên *</label>
+                        <input name="Title" id="expenseTitle" value="@Model.Form.Title" class="form-control" required />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Mô tả</label>
+                        <input name="Description" id="expenseDescription" value="@Model.Form.Description" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Số tiền *</label>
+                        <input name="Amount" id="expenseAmount" value="@Model.Form.Amount" type="number" step="1000" min="0.01" class="form-control" required />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Ngày *</label>
+                        <input name="ExpenseDate" id="expenseDate" value="@Model.Form.ExpenseDate.ToString("yyyy-MM-dd")" type="date" class="form-control" required />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Danh mục *</label>
+                        <select name="CategoryId" id="expenseCategoryId" class="form-select" required>
+                            @foreach (var c in Model.Categories)
+                            {
+                                if (Model.Form.CategoryId == c.Id)
+                                {
+                                    <option value="@c.Id" selected="selected">@c.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@c.Id">@c.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function clearExpenseForm() {
+        document.getElementById('expenseModalTitle').innerText = 'Thêm khoản chi';
+        document.getElementById('expenseForm').action = '@Url.Action("Create")';
+        document.getElementById('expenseId').value = '';
+        document.getElementById('expenseTitle').value = '';
+        document.getElementById('expenseDescription').value = '';
+        document.getElementById('expenseAmount').value = '';
+        document.getElementById('expenseDate').value = new Date().toISOString().slice(0, 10);
+        if (document.getElementById('expenseCategoryId').options.length > 0)
+            document.getElementById('expenseCategoryId').selectedIndex = 0;
+    }
+    @if (Model.ShowFormModal)
+    {
+        <text>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('expenseModalTitle').innerText = '@(Model.IsEdit ? "Sửa khoản chi" : "Thêm khoản chi")';
+            document.getElementById('expenseForm').action = '@(Model.IsEdit ? Url.Action("Edit", new { id = Model.Form.Id }) : Url.Action("Create"))';
+            new bootstrap.Modal(document.getElementById('expenseModal')).show();
+        });
+        </text>
+    }
+</script>
+}

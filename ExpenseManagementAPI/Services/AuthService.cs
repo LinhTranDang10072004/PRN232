@@ -1,6 +1,7 @@
 using BusinessObjects.Enums;
 using BusinessObjects.Models;
 using ExpenseManagementAPI.DTOs.Auth;
+using ExpenseManagementAPI.Services.Interface;
 using Repositories.Interfaces;
 
 namespace ExpenseManagementAPI.Services
