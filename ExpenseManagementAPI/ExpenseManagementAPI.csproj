@@ -28,7 +28,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="DTOs\Auth\" />
+    <Folder Include="DTOs\Corporate\" />
+    <Folder Include="DTOs\Personal\" />
     <Folder Include="Services\Implement\" />
+    <Folder Include="Services\Interface\" />
   </ItemGroup>
 
 </Project>

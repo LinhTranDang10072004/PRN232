@@ -10,4 +10,21 @@
     <ProjectReference Include="..\BusinessObjects\BusinessObjects.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Corporate\Controllers\" />
+    <Folder Include="Areas\Corporate\Views\AdminExpenses\" />
+    <Folder Include="Areas\Corporate\Views\AdminStaffs\" />
+    <Folder Include="Areas\Corporate\Views\Admin\" />
+    <Folder Include="Areas\Corporate\Views\Shared\" />
+    <Folder Include="Areas\Personal\Controllers\" />
+    <Folder Include="Areas\Personal\Views\Categories\" />
+    <Folder Include="Areas\Personal\Views\Expenses\" />
+    <Folder Include="Models\Auth\" />
+    <Folder Include="Models\Personal\" />
+    <Folder Include="Services\" />
+    <Folder Include="Views\Auth\" />
+    <Folder Include="Views\Home\" />
+    <Folder Include="Views\Shared\" />
+  </ItemGroup>
+
 </Project>
