@@ -77,7 +77,7 @@ namespace ClientMVC.Controllers
             }
 
             await SignInAsync(data);
-            return RedirectToAction("Index", "Dashboard", new { area = "Personal" });
+            return RedirectToPersonalExpenses();
         }
 
         [Authorize]
@@ -122,11 +122,15 @@ namespace ClientMVC.Controllers
             role ??= User.FindFirstValue(ClaimTypes.Role);
             return role switch
             {
-                "User" => RedirectToAction("Index", "Dashboard", new { area = "Personal" }),
-                "Admin" => RedirectToAction("Index", "Dashboard", new { area = "Corporate", controller = "Admin" }),
-                "Staff" => RedirectToAction("Index", "Dashboard", new { area = "Corporate", controller = "Staff" }),
+                "User" => RedirectToPersonalExpenses(),
+                "Admin" => RedirectToAction("Dashboard", "Admin", new { area = "Corporate" }),
+                "Staff" => RedirectToAction("Calendar", "StaffExpenses", new { area = "Corporate" }),
                 _ => RedirectToAction(nameof(Login))
             };
         }
+
+        /// <summary>Nhánh 1: sau đăng nhập/đăng ký User vào CRUD chi tiêu cá nhân.</summary>
+        private IActionResult RedirectToPersonalExpenses() =>
+            RedirectToAction("Calendar", "Expenses", new { area = "Personal" });
     }
 }

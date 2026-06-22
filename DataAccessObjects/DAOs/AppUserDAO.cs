@@ -55,7 +55,15 @@ namespace DataAccessObjects.DAOs
         public async Task<List<AppUser>> GetStaffByAdminAsync(ExpenseDbContext context, int adminId) =>
             await context.AppUsers
                 .Where(u => u.Role == UserRole.Staff && u.ParentAdminId == adminId)
+                .OrderByDescending(u => u.IsActive)
+                .ThenBy(u => u.Username)
                 .AsNoTracking()
                 .ToListAsync();
+
+        public async Task<AppUser?> GetStaffForAdminAsync(ExpenseDbContext context, int adminId, int staffId) =>
+            await context.AppUsers.FirstOrDefaultAsync(u =>
+                u.Id == staffId &&
+                u.Role == UserRole.Staff &&
+                u.ParentAdminId == adminId);
     }
 }

@@ -1,5 +1,6 @@
 using BusinessObjects.Enums;
 using BusinessObjects.Models;
+using BusinessObjects.Validation;
 using ExpenseManagementAPI.DTOs.Personal;
 using ExpenseManagementAPI.Services.Interface;
 using Repositories.Interfaces;
@@ -51,12 +52,16 @@ namespace ExpenseManagementAPI.Services
             if (categoryError != null)
                 return (null, categoryError);
 
+            var dateError = ExpenseDateRules.ValidateNotFuture(request.ExpenseDate);
+            if (dateError != null)
+                return (null, dateError);
+
             var expense = new Expense
             {
                 Title = request.Title.Trim(),
                 Description = request.Description?.Trim(),
                 Amount = request.Amount,
-                ExpenseDate = request.ExpenseDate,
+                ExpenseDate = request.ExpenseDate.Date,
                 CategoryId = request.CategoryId,
                 UserId = userId,
                 Status = ExpenseStatus.Approved,
@@ -79,10 +84,14 @@ namespace ExpenseManagementAPI.Services
             if (categoryError != null)
                 return (null, categoryError);
 
+            var dateError = ExpenseDateRules.ValidateNotFuture(request.ExpenseDate);
+            if (dateError != null)
+                return (null, dateError);
+
             expense.Title = request.Title.Trim();
             expense.Description = request.Description?.Trim();
             expense.Amount = request.Amount;
-            expense.ExpenseDate = request.ExpenseDate;
+            expense.ExpenseDate = request.ExpenseDate.Date;
             expense.CategoryId = request.CategoryId;
             expense.Status = ExpenseStatus.Approved;
 

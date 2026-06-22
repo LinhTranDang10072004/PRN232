@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using BusinessObjects.Validation;
+using ClientMVC.Models.Shared;
 
 namespace ClientMVC.Models.Personal
 {
@@ -31,10 +33,39 @@ namespace ClientMVC.Models.Personal
 
         [Required]
         [DataType(DataType.Date)]
+        [NotFutureDate]
         public DateTime ExpenseDate { get; set; } = DateTime.Today;
 
         [Required(ErrorMessage = "Chọn danh mục")]
         public int CategoryId { get; set; }
+    }
+
+    public class PersonalCalendarDayCell
+    {
+        public int? Day { get; set; }
+        public int ExpenseCount { get; set; }
+        public decimal TotalAmount { get; set; }
+        public bool IsToday { get; set; }
+        public bool IsSelected { get; set; }
+    }
+
+    public class PersonalCalendarViewModel
+    {
+        public int Year { get; set; }
+        public int Month { get; set; }
+        public int SelectedDay { get; set; }
+        public string MaxDate => DateTime.Today.ToString("yyyy-MM-dd");
+        public CalendarFilterModel Filters { get; set; } = new();
+        public string MonthTitle => $"Tháng {Month}/{Year}";
+        public List<PersonalCalendarDayCell> CalendarDays { get; set; } = new();
+        public List<ExpenseItem> DayExpenses { get; set; } = new();
+        public List<ExpenseItem> MonthExpenses { get; set; } = new();
+        public List<CategoryItem> Categories { get; set; } = new();
+        public ExpenseFormModel Form { get; set; } = new();
+        public bool ShowFormModal { get; set; }
+        public bool IsEdit { get; set; }
+        public string? ErrorMessage { get; set; }
+        public string? SuccessMessage { get; set; }
     }
 
     public class ExpenseIndexViewModel

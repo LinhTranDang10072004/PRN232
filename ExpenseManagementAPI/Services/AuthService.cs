@@ -22,16 +22,19 @@ namespace ExpenseManagementAPI.Services
             _jwtTokenService = jwtTokenService;
         }
 
-        public async Task<AuthResponse?> LoginAsync(LoginRequest request)
+        public async Task<(AuthResponse? Response, string? Error)> LoginAsync(LoginRequest request)
         {
             var user = await _userRepository.GetByUsernameAsync(request.Username);
-            if (user == null || !user.IsActive)
-                return null;
+            if (user == null)
+                return (null, "Tên đăng nhập hoặc mật khẩu không đúng.");
 
             if (!_passwordHasher.Verify(request.Password, user.Password))
-                return null;
+                return (null, "Tên đăng nhập hoặc mật khẩu không đúng.");
 
-            return BuildResponse(user);
+            if (!user.IsActive)
+                return (null, "Tài khoản đã bị vô hiệu hóa. Liên hệ Admin công ty.");
+
+            return (BuildResponse(user), null);
         }
 
         public async Task<(AuthResponse? Response, string? Error)> RegisterUserAsync(RegisterRequest request)

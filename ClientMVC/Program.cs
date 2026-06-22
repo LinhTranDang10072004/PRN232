@@ -29,6 +29,11 @@ builder.Services.AddHttpClient<IPersonalApiClient, PersonalApiClient>(client =>
     client.BaseAddress = new Uri(apiBaseUrl);
 });
 
+builder.Services.AddHttpClient<ICorporateApiClient, CorporateApiClient>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+});
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

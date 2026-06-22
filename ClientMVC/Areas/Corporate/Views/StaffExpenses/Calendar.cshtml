@@ -1,0 +1,163 @@
+@using ClientMVC.Helpers
+@model ClientMVC.Models.Corporate.CorporateCalendarViewModel
+@{
+    ViewData["Title"] = "Lịch chi tiêu — Staff";
+    var route = CalendarHelper.FilterRouteData(Model.Filters);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h2 class="mb-0">Khai báo chi tiêu</h2>
+    <button type="button" class="btn btn-info text-dark" data-bs-toggle="modal" data-bs-target="#expenseModal"
+            onclick="clearCorpForm(@Model.Year, @Model.Month, @Model.SelectedDay)">
+        + Thêm ngày @Model.SelectedDay/@Model.Month
+    </button>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage)) { <div class="alert alert-success">@Model.SuccessMessage</div> }
+@if (!string.IsNullOrEmpty(Model.ErrorMessage)) { <div class="alert alert-danger">@Model.ErrorMessage</div> }
+
+<div class="alert alert-info py-2 small mb-3">
+    Ngày chi tiêu <strong>không được ở tương lai</strong>. Đã <strong>Approved</strong> thì không sửa/xóa.
+</div>
+
+<partial name="~/Areas/Corporate/Views/Shared/_CalendarFilters.cshtml" />
+<partial name="~/Areas/Corporate/Views/Shared/_CalendarMonth.cshtml" />
+
+<div class="card border-primary">
+    <div class="card-header bg-primary text-white">
+        <strong>Chi tiết ngày @Model.SelectedDay/@Model.Month/@Model.Year</strong>
+        <span class="badge bg-light text-dark ms-2">@Model.DayExpenses.Count khoản</span>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.DayExpenses.Count == 0)
+        {
+            <p class="text-muted p-3 mb-0">Không có khoản chi trong ngày này (theo bộ lọc hiện tại).</p>
+        }
+        else
+        {
+            <div class="list-group list-group-flush">
+                @foreach (var e in Model.DayExpenses)
+                {
+                    var badge = e.Status switch { "Approved" => "success", "Rejected" => "danger", _ => "warning" };
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between flex-wrap gap-2">
+                            <div>
+                                <strong>@e.Title</strong>
+                                <span class="badge bg-secondary ms-1">@e.CategoryName</span>
+                                <br /><span class="text-muted">@e.Amount.ToString("N0") đ</span>
+                                @if (!string.IsNullOrEmpty(e.RejectionReason))
+                                {
+                                    <br /><small class="text-danger">@e.RejectionReason</small>
+                                }
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-@badge">@e.Status</span>
+                                @if (e.CanEdit)
+                                {
+                                    <br />
+                                    <a asp-action="Calendar"
+                                       asp-route-year="@Model.Year" asp-route-month="@Model.Month"
+                                       asp-route-day="@Model.SelectedDay" asp-route-editId="@e.Id"
+                                       asp-all-route-data="route"
+                                       class="btn btn-sm btn-outline-secondary mt-1">Sửa</a>
+                                    <form asp-action="Delete" method="post" class="d-inline"
+                                          onsubmit="return confirm('Xóa khoản chi này?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@e.Id" />
+                                        <input type="hidden" name="year" value="@Model.Year" />
+                                        <input type="hidden" name="month" value="@Model.Month" />
+                                        <input type="hidden" name="day" value="@Model.SelectedDay" />
+                                        <input type="hidden" name="filterKeyword" value="@Model.Filters.FilterKeyword" />
+                                        <input type="hidden" name="filterCategoryId" value="@Model.Filters.FilterCategoryId" />
+                                        <input type="hidden" name="filterStatus" value="@Model.Filters.FilterStatus" />
+                                        <input type="hidden" name="filterMinAmount" value="@Model.Filters.FilterMinAmount" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger mt-1">Xóa</button>
+                                    </form>
+                                }
+                                else { <br /><small class="text-muted">Đã khóa</small> }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="expenseModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="corpForm" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="year" value="@Model.Year" />
+                <input type="hidden" name="month" value="@Model.Month" />
+                <input type="hidden" name="day" value="@Model.SelectedDay" />
+                <input type="hidden" name="filterKeyword" value="@Model.Filters.FilterKeyword" />
+                <input type="hidden" name="filterCategoryId" value="@Model.Filters.FilterCategoryId" />
+                <input type="hidden" name="filterStatus" value="@Model.Filters.FilterStatus" />
+                <input type="hidden" name="filterMinAmount" value="@Model.Filters.FilterMinAmount" />
+                <div class="modal-header">
+                    <h5 class="modal-title" id="corpModalTitle">Thêm khoản chi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="mb-2">
+                        <label asp-for="Form.Title" class="form-label">Tên *</label>
+                        <input asp-for="Form.Title" class="form-control" />
+                        <span asp-validation-for="Form.Title" class="text-danger"></span>
+                    </div>
+                    <div class="mb-2">
+                        <label asp-for="Form.Description" class="form-label">Mô tả</label>
+                        <input asp-for="Form.Description" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                        <label asp-for="Form.Amount" class="form-label">Số tiền *</label>
+                        <input asp-for="Form.Amount" type="number" step="1000" min="0.01" class="form-control" />
+                        <span asp-validation-for="Form.Amount" class="text-danger"></span>
+                    </div>
+                    <div class="mb-2">
+                        <label asp-for="Form.ExpenseDate" class="form-label">Ngày phát sinh *</label>
+                        <input asp-for="Form.ExpenseDate" type="date" class="form-control" max="@Model.MaxDate" />
+                        <span asp-validation-for="Form.ExpenseDate" class="text-danger"></span>
+                        <small class="text-muted">Chỉ được chọn hôm nay hoặc quá khứ.</small>
+                    </div>
+                    <div class="mb-2">
+                        <label asp-for="Form.CategoryId" class="form-label">Chủ đề / Danh mục *</label>
+                        <select asp-for="Form.CategoryId" class="form-select"
+                                asp-items="@(new SelectList(Model.Categories, "Id", "Name"))"></select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-info text-dark">Gửi chờ duyệt</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function clearCorpForm(y, m, d) {
+            document.getElementById('corpModalTitle').innerText = 'Thêm khoản chi';
+            document.getElementById('corpForm').action = '@Url.Action("Create")';
+            document.getElementById('Form_Title').value = '';
+            document.getElementById('Form_Description').value = '';
+            document.getElementById('Form_Amount').value = '';
+            document.getElementById('Form_ExpenseDate').value = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+            document.getElementById('Form_ExpenseDate').max = '@Model.MaxDate';
+        }
+        @if (Model.ShowFormModal)
+        {
+            <text>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.getElementById('corpModalTitle').innerText = '@(Model.IsEdit ? "Sửa khoản chi" : "Thêm khoản chi")';
+                document.getElementById('corpForm').action = '@(Model.IsEdit ? Url.Action("Edit", new { id = Model.Form.Id }) : Url.Action("Create"))';
+                new bootstrap.Modal(document.getElementById('expenseModal')).show();
+            });
+            </text>
+        }
+    </script>
+}

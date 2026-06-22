@@ -11,9 +11,9 @@ namespace ClientMVC.Controllers
             {
                 return User.FindFirstValue(ClaimTypes.Role) switch
                 {
-                    "User" => RedirectToAction("Index", "Dashboard", new { area = "Personal" }),
+                    "User" => RedirectToAction("Calendar", "Expenses", new { area = "Personal" }),
                     "Admin" => RedirectToAction("Dashboard", "Admin", new { area = "Corporate" }),
-                    "Staff" => RedirectToAction("Dashboard", "Staff", new { area = "Corporate" }),
+                    "Staff" => RedirectToAction("Calendar", "StaffExpenses", new { area = "Corporate" }),
                     _ => RedirectToAction("Login", "Auth")
                 };
             }

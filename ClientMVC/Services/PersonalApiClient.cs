@@ -122,6 +122,9 @@ namespace ClientMVC.Services
         private async Task<HttpResponseMessage> SendAsync(HttpMethod method, string url, object? body = null)
         {
             var token = _httpContextAccessor.HttpContext?.User.FindFirst("jwt")?.Value;
+            if (string.IsNullOrEmpty(token))
+                throw new InvalidOperationException("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+
             using var request = new HttpRequestMessage(method, url);
             if (!string.IsNullOrEmpty(token))
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);

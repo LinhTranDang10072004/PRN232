@@ -1,56 +1,51 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using BusinessObjects.Enums;
 
 namespace BusinessObjects.Models
 {
+    [Table("Expense")]
     public class Expense
     {
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Tên khoản chi không được để trống")]
-        [StringLength(200)]
+        [Required]
+        [StringLength(255)]
         public string Title { get; set; } = null!;
 
-        [StringLength(500)]
         public string? Description { get; set; }
 
-        [Required(ErrorMessage = "Số tiền không được để trống")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Số tiền phải lớn hơn 0")]
+        [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
-        [Required(ErrorMessage = "Ngày chi tiêu không được để trống")]
-        public DateTime ExpenseDate { get; set; }
+        public DateTime? ExpenseDate { get; set; }
 
-        /// <summary>Nhánh 2: Pending/Approved/Rejected. Nhánh 1: API luôn ghi Approved.</summary>
-        [Required]
-        public ExpenseStatus Status { get; set; } = ExpenseStatus.Pending;
+        [StringLength(50)]
+        public string? Status { get; set; }
 
-        /// <summary>User (cá nhân) hoặc Staff (công ty) — API filter theo Role.</summary>
-        [Required]
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
 
-        [ForeignKey(nameof(UserId))]
-        public AppUser User { get; set; } = null!;
-
-        [Required(ErrorMessage = "Vui lòng chọn danh mục")]
-        public int CategoryId { get; set; }
-
-        [ForeignKey(nameof(CategoryId))]
-        public Category Category { get; set; } = null!;
+        public int? BudgetDetailId { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public DateTime? ReviewedAt { get; set; }
+        public int? WalletId { get; set; }
 
-        public int? ReviewedByAdminId { get; set; }
+        public int? AccountId { get; set; }
 
-        [ForeignKey(nameof(ReviewedByAdminId))]
-        public AppUser? ReviewedByAdmin { get; set; }
+        [ForeignKey(nameof(UserId))]
+        public User? User { get; set; }
 
-        [StringLength(500)]
-        public string? RejectionReason { get; set; }
+        [ForeignKey(nameof(BudgetDetailId))]
+        public BudgetDetail? BudgetDetail { get; set; }
+
+        [ForeignKey(nameof(WalletId))]
+        public Wallet? Wallet { get; set; }
+
+        [ForeignKey(nameof(AccountId))]
+        public Account? Account { get; set; }
+
+        public ICollection<ApprovalHistory> ApprovalHistories { get; set; } = new List<ApprovalHistory>();
     }
 }

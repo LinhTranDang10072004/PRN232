@@ -1,0 +1,120 @@
+@model ClientMVC.Models.Corporate.StaffManageViewModel
+@{
+    ViewData["Title"] = "Quản lý nhân viên";
+}
+
+<div class="d-flex justify-content-between mb-3">
+    <h2>Quản lý Staff</h2>
+    <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#staffModal">+ Thêm nhân viên</button>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage)) { <div class="alert alert-success">@Model.SuccessMessage</div> }
+@if (!string.IsNullOrEmpty(Model.ErrorMessage)) { <div class="alert alert-danger">@Model.ErrorMessage</div> }
+
+<p class="text-muted small">
+    <strong>Vô hiệu hóa</strong> khi nhân viên sa thải/nghỉ — không đăng nhập được.
+    <strong>Kích hoạt lại</strong> khi quay lại làm việc.
+</p>
+
+<table class="table table-striped table-bordered align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Username</th>
+            <th>Họ tên</th>
+            <th>Email</th>
+            <th>Trạng thái</th>
+            <th>Ngày tạo</th>
+            <th style="width:200px">Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+    @if (Model.Staffs.Count == 0)
+    {
+        <tr><td colspan="6" class="text-center text-muted">Chưa có nhân viên. Bấm "Thêm nhân viên".</td></tr>
+    }
+    @foreach (var s in Model.Staffs)
+    {
+        <tr class="@(s.IsActive ? "" : "table-secondary")">
+            <td>@s.Username</td>
+            <td>@(s.FullName ?? "—")</td>
+            <td>@s.Email</td>
+            <td>
+                @if (s.IsActive)
+                {
+                    <span class="badge bg-success">Đang hoạt động</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Đã sa thải / Vô hiệu</span>
+                }
+            </td>
+            <td>@s.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
+            <td>
+                @if (s.IsActive)
+                {
+                    <form asp-action="Deactivate" asp-route-id="@s.Id" method="post" class="d-inline"
+                          onsubmit="return confirm('Vô hiệu hóa @s.Username? Nhân viên sẽ không đăng nhập được.');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Sa thải / Khóa</button>
+                    </form>
+                }
+                else
+                {
+                    <form asp-action="Activate" asp-route-id="@s.Id" method="post" class="d-inline"
+                          onsubmit="return confirm('Kích hoạt lại @s.Username?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-outline-success">Kích hoạt lại</button>
+                    </form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<div class="modal fade" id="staffModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form asp-action="Create" method="post" class="modal-content">
+            @Html.AntiForgeryToken()
+            <div class="modal-header">
+                <h5 class="modal-title">Cấp tài khoản Staff</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="mb-2">
+                    <label asp-for="Form.Username" class="form-label">Username *</label>
+                    <input asp-for="Form.Username" class="form-control" />
+                    <span asp-validation-for="Form.Username" class="text-danger"></span>
+                </div>
+                <div class="mb-2">
+                    <label asp-for="Form.FullName" class="form-label">Họ tên</label>
+                    <input asp-for="Form.FullName" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label asp-for="Form.Email" class="form-label">Email *</label>
+                    <input asp-for="Form.Email" class="form-control" />
+                    <span asp-validation-for="Form.Email" class="text-danger"></span>
+                </div>
+                <div class="mb-2">
+                    <label asp-for="Form.Password" class="form-label">Mật khẩu *</label>
+                    <input asp-for="Form.Password" type="password" class="form-control" />
+                    <span asp-validation-for="Form.Password" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn btn-dark">Tạo Staff</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    @if (Model.ShowCreateModal)
+    {
+        <script>document.addEventListener('DOMContentLoaded', () => new bootstrap.Modal(document.getElementById('staffModal')).show());</script>
+    }
+}
+

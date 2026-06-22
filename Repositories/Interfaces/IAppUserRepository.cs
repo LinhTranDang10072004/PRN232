@@ -11,5 +11,7 @@ namespace Repositories.Interfaces
         Task RegisterPersonalUserAsync(AppUser user);
         Task<AppUser> CreateStaffAsync(AppUser staff, int adminId);
         Task<List<AppUser>> GetStaffByAdminAsync(int adminId);
+        Task<AppUser?> GetStaffForAdminAsync(int adminId, int staffId);
+        Task UpdateAsync(AppUser user);
     }
 }

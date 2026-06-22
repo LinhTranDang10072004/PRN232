@@ -1,0 +1,48 @@
+@model ClientMVC.Models.Corporate.CorporateCalendarViewModel
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <input type="hidden" name="year" value="@Model.Year" />
+            <input type="hidden" name="month" value="@Model.Month" />
+            <input type="hidden" name="day" value="@Model.SelectedDay" />
+            <div class="col-md-3">
+                <label class="form-label">Tìm tên (OData)</label>
+                <input name="filterKeyword" value="@Model.Filters.FilterKeyword" class="form-control" placeholder="VD: công tác" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Chủ đề / Danh mục</label>
+                <select name="filterCategoryId" class="form-select">
+                    <option value="">-- Tất cả --</option>
+                    @foreach (var c in Model.Categories)
+                    {
+                        if (Model.Filters.FilterCategoryId == c.Id)
+                        {
+                            <option value="@c.Id" selected="selected">@c.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@c.Id">@c.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Trạng thái</label>
+                <select name="filterStatus" class="form-select">
+                    <option value="">-- Tất cả --</option>
+                    <option value="Pending" selected="@(Model.Filters.FilterStatus == "Pending" ? "selected" : null)">@(Model.IsAdminView ? "Pending" : "Chờ duyệt")</option>
+                    <option value="Approved" selected="@(Model.Filters.FilterStatus == "Approved" ? "selected" : null)">@(Model.IsAdminView ? "Approved" : "Đã duyệt")</option>
+                    <option value="Rejected" selected="@(Model.Filters.FilterStatus == "Rejected" ? "selected" : null)">@(Model.IsAdminView ? "Rejected" : "Từ chối")</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Số tiền tối thiểu</label>
+                <input name="filterMinAmount" value="@Model.Filters.FilterMinAmount" type="number" step="1000" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary w-100">Lọc</button>
+            </div>
+        </form>
+    </div>
+</div>

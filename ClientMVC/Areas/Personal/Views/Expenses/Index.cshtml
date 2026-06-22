@@ -107,38 +107,33 @@
                 </div>
                 <div class="modal-body">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <input type="hidden" name="Id" id="expenseId" value="@Model.Form.Id" />
+                    <input type="hidden" asp-for="Form.Id" id="expenseId" />
                     <div class="mb-2">
-                        <label class="form-label">Tên *</label>
-                        <input name="Title" id="expenseTitle" value="@Model.Form.Title" class="form-control" required />
+                        <label asp-for="Form.Title" class="form-label">Tên *</label>
+                        <input asp-for="Form.Title" id="expenseTitle" class="form-control" />
+                        <span asp-validation-for="Form.Title" class="text-danger"></span>
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Mô tả</label>
-                        <input name="Description" id="expenseDescription" value="@Model.Form.Description" class="form-control" />
+                        <input asp-for="Form.Description" id="expenseDescription" class="form-control" />
                     </div>
                     <div class="mb-2">
-                        <label class="form-label">Số tiền *</label>
-                        <input name="Amount" id="expenseAmount" value="@Model.Form.Amount" type="number" step="1000" min="0.01" class="form-control" required />
+                        <label asp-for="Form.Amount" class="form-label">Số tiền *</label>
+                        <input asp-for="Form.Amount" id="expenseAmount" type="number" step="1000" min="0.01" class="form-control" />
+                        <span asp-validation-for="Form.Amount" class="text-danger"></span>
                     </div>
                     <div class="mb-2">
-                        <label class="form-label">Ngày *</label>
-                        <input name="ExpenseDate" id="expenseDate" value="@Model.Form.ExpenseDate.ToString("yyyy-MM-dd")" type="date" class="form-control" required />
+                        <label asp-for="Form.ExpenseDate" class="form-label">Ngày *</label>
+                        <input asp-for="Form.ExpenseDate" id="expenseDate" type="date" class="form-control" max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        <span asp-validation-for="Form.ExpenseDate" class="text-danger"></span>
+                        <span asp-validation-for="Form.ExpenseDate" class="text-danger"></span>
                     </div>
                     <div class="mb-2">
-                        <label class="form-label">Danh mục *</label>
-                        <select name="CategoryId" id="expenseCategoryId" class="form-select" required>
-                            @foreach (var c in Model.Categories)
-                            {
-                                if (Model.Form.CategoryId == c.Id)
-                                {
-                                    <option value="@c.Id" selected="selected">@c.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@c.Id">@c.Name</option>
-                                }
-                            }
+                        <label asp-for="Form.CategoryId" class="form-label">Danh mục *</label>
+                        <select asp-for="Form.CategoryId" id="expenseCategoryId" class="form-select"
+                                asp-items="@(new SelectList(Model.Categories, "Id", "Name"))">
                         </select>
+                        <span asp-validation-for="Form.CategoryId" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -151,6 +146,7 @@
 </div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 <script>
     function clearExpenseForm() {
         document.getElementById('expenseModalTitle').innerText = 'Thêm khoản chi';

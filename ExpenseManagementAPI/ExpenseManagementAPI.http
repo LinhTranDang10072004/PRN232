@@ -54,7 +54,7 @@ DELETE {{ExpenseManagementAPI_HostAddress}}/api/personal/categories/15
 Authorization: Bearer {{token}}
 
 ### Danh sách chi tiêu + OData
-GET {{ExpenseManagementAPI_HostAddress}}/api/personal/expenses?$filter=Amount gt 50000&$orderby=ExpenseDate desc&$top=10&$count=true
+GET {{ExpenseManagementAPI_HostAddress}}/api/personal/expenses?$filter=Amount%20gt%2050000&$orderby=ExpenseDate%20desc&$top=10&$count=true
 Authorization: Bearer {{token}}
 
 ### Chi tiết một khoản

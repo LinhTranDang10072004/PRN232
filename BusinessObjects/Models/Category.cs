@@ -1,26 +1,37 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using BusinessObjects.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BusinessObjects.Models
 {
+    [Table("Category")]
     public class Category
     {
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Tên danh mục không được để trống")]
-        [StringLength(100)]
+        [Required]
+        [StringLength(255)]
         public string Name { get; set; } = null!;
 
-        [Required]
-        public CategoryBranch Branch { get; set; }
+        [StringLength(100)]
+        public string? Branch { get; set; }
 
-        /// <summary>null = danh mục hệ thống (seed). Có giá trị = User tự tạo.</summary>
         public int? OwnerUserId { get; set; }
 
-        public AppUser? OwnerUser { get; set; }
+        [StringLength(50)]
+        public string? Type { get; set; }
 
-        public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
+        public int? CompanyId { get; set; }
+
+        [StringLength(50)]
+        public string? Status { get; set; }
+
+        [ForeignKey(nameof(OwnerUserId))]
+        public User? OwnerUser { get; set; }
+
+        [ForeignKey(nameof(CompanyId))]
+        public Company? Company { get; set; }
+
+        public ICollection<Budget> Budgets { get; set; } = new List<Budget>();
     }
 }

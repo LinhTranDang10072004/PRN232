@@ -21,6 +21,8 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPersonalCategoryService, PersonalCategoryService>();
 builder.Services.AddScoped<IPersonalExpenseService, PersonalExpenseService>();
+builder.Services.AddScoped<ICorporateExpenseService, CorporateExpenseService>();
+builder.Services.AddScoped<ICorporateStaffService, CorporateStaffService>();
 builder.Services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 

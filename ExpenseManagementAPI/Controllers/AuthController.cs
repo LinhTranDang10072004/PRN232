@@ -24,9 +24,9 @@ namespace ExpenseManagementAPI.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _authService.LoginAsync(request);
+            var (result, error) = await _authService.LoginAsync(request);
             if (result == null)
-                return Unauthorized(new { message = "Tên đăng nhập hoặc mật khẩu không đúng." });
+                return Unauthorized(new { message = error ?? "Tên đăng nhập hoặc mật khẩu không đúng." });
 
             return Ok(result);
         }

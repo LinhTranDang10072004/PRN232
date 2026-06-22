@@ -45,5 +45,11 @@ namespace Repositories.Implementations
 
         public Task<List<AppUser>> GetStaffByAdminAsync(int adminId) =>
             _dao.GetStaffByAdminAsync(_context, adminId);
+
+        public Task<AppUser?> GetStaffForAdminAsync(int adminId, int staffId) =>
+            _dao.GetStaffForAdminAsync(_context, adminId, staffId);
+
+        public Task UpdateAsync(AppUser user) =>
+            _dao.UpdateAsync(_context, user);
     }
 }

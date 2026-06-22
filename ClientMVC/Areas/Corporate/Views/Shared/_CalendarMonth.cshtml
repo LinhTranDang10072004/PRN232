@@ -1,0 +1,69 @@
+@using ClientMVC.Helpers
+@model ClientMVC.Models.Corporate.CorporateCalendarViewModel
+@{
+    var route = CalendarHelper.FilterRouteData(Model.Filters);
+}
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a class="btn btn-outline-secondary btn-sm"
+               asp-action="Calendar"
+               asp-route-year="@(Model.Month == 1 ? Model.Year - 1 : Model.Year)"
+               asp-route-month="@(Model.Month == 1 ? 12 : Model.Month - 1)"
+               asp-route-day="1"
+               asp-all-route-data="route">‹ Tháng trước</a>
+            <h4 class="mb-0">@Model.MonthTitle</h4>
+            <a class="btn btn-outline-secondary btn-sm"
+               asp-action="Calendar"
+               asp-route-year="@(Model.Month == 12 ? Model.Year + 1 : Model.Year)"
+               asp-route-month="@(Model.Month == 12 ? 1 : Model.Month + 1)"
+               asp-route-day="1"
+               asp-all-route-data="route">Tháng sau ›</a>
+        </div>
+
+        <p class="text-muted small mb-2">Bấm vào <strong>ngày</strong> để xem chi tiết khoản chi của ngày đó.</p>
+
+        <table class="table table-bordered text-center mb-0">
+            <thead class="table-light">
+                <tr><th>CN</th><th>T2</th><th>T3</th><th>T4</th><th>T5</th><th>T6</th><th>T7</th></tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < Model.CalendarDays.Count; i += 7)
+                {
+                    <tr>
+                        @for (var j = i; j < i + 7; j++)
+                        {
+                            if (j < Model.CalendarDays.Count)
+                            {
+                                var cell = Model.CalendarDays[j];
+                                if (cell.Day == null)
+                                {
+                                    <td class="bg-light"></td>
+                                }
+                                else
+                                {
+                                    <td class="@(cell.IsSelected ? "table-primary" : "") @(cell.IsToday ? "border border-2 border-dark" : "")" style="vertical-align:top; min-width:72px;">
+                                        <a asp-action="Calendar"
+                                           asp-route-year="@Model.Year"
+                                           asp-route-month="@Model.Month"
+                                           asp-route-day="@cell.Day"
+                                           asp-all-route-data="route"
+                                           class="d-block text-decoration-none text-dark fw-bold py-1">@cell.Day</a>
+                                        @if (cell.ExpenseCount > 0)
+                                        {
+                                            <small class="d-block">@cell.ExpenseCount khoản</small>
+                                            <small class="d-block text-muted">@cell.TotalAmount.ToString("N0")đ</small>
+                                            @if (cell.HasPending) { <span class="badge bg-warning text-dark">⏳</span> }
+                                        }
+                                    </td>
+                                }
+                            }
+                            else { <td class="bg-light"></td> }
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
