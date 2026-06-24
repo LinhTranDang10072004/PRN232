@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Chi tiêu cá nhân</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="personal-app">
+    <nav class="navbar navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-area="Personal" asp-controller="Dashboard" asp-action="Index">💰 Expense Personal</a>
+            <div class="d-flex align-items-center gap-2 text-white">
+                <span class="d-none d-md-inline">@User.Identity?.Name</span>
+                <a class="btn btn-sm btn-outline-light position-relative" asp-area="Personal" asp-controller="Notifications" asp-action="Index">
+                    🔔
+                    @{ var unread = ViewBag.UnreadCount as int? ?? 0; }
+                    @if (unread > 0)
+                    {
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@unread</span>
+                    }
+                </a>
+                <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-sm btn-outline-light">Đăng xuất</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-md-3 col-lg-2 personal-sidebar py-3">
+                <nav class="nav flex-column personal-nav">
+                    <a class="nav-link" asp-area="Personal" asp-controller="Dashboard" asp-action="Index">📊 Tổng quan</a>
+                    <a class="nav-link nav-link-highlight" asp-area="Personal" asp-controller="Expenses" asp-action="Calendar">📅 Lịch chi tiêu</a>
+                    <a class="nav-link" asp-area="Personal" asp-controller="Expenses" asp-action="Index">📋 Danh sách chi</a>
+                    <a class="nav-link" asp-area="Personal" asp-controller="Wallets" asp-action="Index">👛 Ví</a>
+                    <a class="nav-link" asp-area="Personal" asp-controller="Categories" asp-action="Index">🏷️ Danh mục</a>
+                    <a class="nav-link" asp-area="Personal" asp-controller="Budgets" asp-action="Index">🎯 Budget</a>
+                    <a class="nav-link" asp-area="Personal" asp-controller="Reports" asp-action="Index">📈 Báo cáo</a>
+                    <a class="nav-link" asp-area="Personal" asp-controller="Notifications" asp-action="Index">🔔 Thông báo</a>
+                    <a class="nav-link" asp-area="Personal" asp-controller="Profile" asp-action="Index">👤 Hồ sơ</a>
+                </nav>
+            </aside>
+            <main class="col-md-9 col-lg-10 py-3 personal-main">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show">@TempData["Success"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show">@TempData["Error"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+                }
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

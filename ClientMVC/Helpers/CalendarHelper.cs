@@ -1,127 +1,77 @@
-using ClientMVC.Models.Corporate;
 using ClientMVC.Models.Personal;
-using ClientMVC.Models.Shared;
 
 namespace ClientMVC.Helpers
 {
     public static class CalendarHelper
     {
-        public static List<CalendarDayCell> BuildMonthGrid(
-            int year, int month, List<CorporateExpenseItem> monthExpenses, int selectedDay)
+        private static readonly string[] WeekdayHeaders = { "T2", "T3", "T4", "T5", "T6", "T7", "CN" };
+
+        public static string[] GetWeekdayHeaders() => WeekdayHeaders;
+
+        public static CalendarMonthViewModel Build(int year, int month, List<ExpenseDto> expenses, int? selectedDay = null)
         {
+            var firstDay = new DateTime(year, month, 1);
+            var daysInMonth = DateTime.DaysInMonth(year, month);
             var today = DateTime.Today;
-            var cells = new List<CalendarDayCell>();
-            var first = new DateTime(year, month, 1);
-            var startOffset = (int)first.DayOfWeek;
+
+            var byDay = expenses
+                .Where(e => e.ExpenseDate.HasValue)
+                .GroupBy(e => e.ExpenseDate!.Value.Day)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var startOffset = ((int)firstDay.DayOfWeek + 6) % 7;
+            var weeks = new List<CalendarWeekViewModel>();
+            var currentWeek = new CalendarWeekViewModel();
 
             for (var i = 0; i < startOffset; i++)
-                cells.Add(new CalendarDayCell { Day = null });
+                currentWeek.Days.Add(new CalendarDayViewModel { IsCurrentMonth = false });
 
-            for (var d = 1; d <= DateTime.DaysInMonth(year, month); d++)
+            for (var day = 1; day <= daysInMonth; day++)
             {
-                var dayItems = monthExpenses.Where(e => e.ExpenseDate.Day == d).ToList();
-                cells.Add(new CalendarDayCell
+                if (currentWeek.Days.Count == 7)
                 {
-                    Day = d,
-                    ExpenseCount = dayItems.Count,
-                    TotalAmount = dayItems.Sum(x => x.Amount),
-                    IsToday = today.Year == year && today.Month == month && today.Day == d,
-                    IsSelected = d == selectedDay,
-                    HasPending = dayItems.Any(x => x.Status == "Pending")
+                    weeks.Add(currentWeek);
+                    currentWeek = new CalendarWeekViewModel();
+                }
+
+                byDay.TryGetValue(day, out var dayExpenses);
+                dayExpenses ??= new List<ExpenseDto>();
+
+                currentWeek.Days.Add(new CalendarDayViewModel
+                {
+                    Day = day,
+                    IsCurrentMonth = true,
+                    IsToday = today.Year == year && today.Month == month && today.Day == day,
+                    Expenses = dayExpenses,
+                    DayTotal = dayExpenses.Sum(e => e.Amount)
                 });
             }
-            return cells;
-        }
 
-        public static List<PersonalCalendarDayCell> BuildPersonalMonthGrid(
-            int year, int month, List<ExpenseItem> monthExpenses, int selectedDay)
-        {
-            var today = DateTime.Today;
-            var cells = new List<PersonalCalendarDayCell>();
-            var first = new DateTime(year, month, 1);
-            var startOffset = (int)first.DayOfWeek;
+            while (currentWeek.Days.Count > 0 && currentWeek.Days.Count < 7)
+                currentWeek.Days.Add(new CalendarDayViewModel { IsCurrentMonth = false });
 
-            for (var i = 0; i < startOffset; i++)
-                cells.Add(new PersonalCalendarDayCell { Day = null });
+            if (currentWeek.Days.Count > 0)
+                weeks.Add(currentWeek);
 
-            for (var d = 1; d <= DateTime.DaysInMonth(year, month); d++)
+            return new CalendarMonthViewModel
             {
-                var dayItems = monthExpenses.Where(e => e.ExpenseDate.Day == d).ToList();
-                cells.Add(new PersonalCalendarDayCell
-                {
-                    Day = d,
-                    ExpenseCount = dayItems.Count,
-                    TotalAmount = dayItems.Sum(x => x.Amount),
-                    IsToday = today.Year == year && today.Month == month && today.Day == d,
-                    IsSelected = d == selectedDay
-                });
-            }
-            return cells;
-        }
-
-        public static string BuildMonthODataFilter(int year, int month, CalendarFilterModel? filter = null)
-        {
-            var start = new DateTime(year, month, 1);
-            var end = start.AddMonths(1);
-            var parts = new List<string>
-            {
-                $"ExpenseDate ge {start:yyyy-MM-dd}",
-                $"ExpenseDate lt {end:yyyy-MM-dd}"
+                Year = year,
+                Month = month,
+                MonthLabel = $"Tháng {month}/{year}",
+                Weeks = weeks,
+                MonthTotal = expenses.Sum(e => e.Amount),
+                ExpenseCount = expenses.Count,
+                SelectedDay = selectedDay,
+                SelectedDayExpenses = selectedDay.HasValue && byDay.TryGetValue(selectedDay.Value, out var selected)
+                    ? selected
+                    : new List<ExpenseDto>()
             };
-
-            if (filter != null)
-            {
-                if (filter.FilterCategoryId.HasValue)
-                    parts.Add($"CategoryId eq {filter.FilterCategoryId.Value}");
-
-                if (filter.FilterMinAmount.HasValue)
-                    parts.Add($"Amount ge {filter.FilterMinAmount.Value}");
-
-                if (!string.IsNullOrWhiteSpace(filter.FilterKeyword))
-                {
-                    var kw = filter.FilterKeyword.Trim().Replace("'", "''");
-                    parts.Add($"contains(Title,'{kw}')");
-                }
-
-                if (!string.IsNullOrWhiteSpace(filter.FilterStatus))
-                {
-                    var statusCode = filter.FilterStatus switch
-                    {
-                        "Approved" => 1,
-                        "Rejected" => 2,
-                        _ => 0
-                    };
-                    parts.Add($"Status eq {statusCode}");
-                }
-            }
-
-            return $"?$filter={string.Join(" and ", parts)}&$orderby=ExpenseDate desc";
         }
 
-        public static object CalendarRoute(int year, int month, int day, CalendarFilterModel? filter = null) => new
+        public static (int Year, int Month) ShiftMonth(int year, int month, int delta)
         {
-            year,
-            month,
-            day,
-            filterKeyword = filter?.FilterKeyword,
-            filterCategoryId = filter?.FilterCategoryId,
-            filterStatus = filter?.FilterStatus,
-            filterMinAmount = filter?.FilterMinAmount
-        };
-
-        public static Dictionary<string, string> FilterRouteData(CalendarFilterModel? filter)
-        {
-            var dict = new Dictionary<string, string>();
-            if (filter == null) return dict;
-            if (!string.IsNullOrWhiteSpace(filter.FilterKeyword))
-                dict["filterKeyword"] = filter.FilterKeyword;
-            if (filter.FilterCategoryId.HasValue)
-                dict["filterCategoryId"] = filter.FilterCategoryId.Value.ToString();
-            if (!string.IsNullOrWhiteSpace(filter.FilterStatus))
-                dict["filterStatus"] = filter.FilterStatus;
-            if (filter.FilterMinAmount.HasValue)
-                dict["filterMinAmount"] = filter.FilterMinAmount.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
-            return dict;
+            var date = new DateTime(year, month, 1).AddMonths(delta);
+            return (date.Year, date.Month);
         }
     }
 }

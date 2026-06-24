@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BusinessObjects.Enums;
 
 namespace BusinessObjects.Models
 {
@@ -23,22 +24,19 @@ namespace BusinessObjects.Models
         [StringLength(255)]
         public string? FullName { get; set; }
 
-        [StringLength(50)]
-        public string? Role { get; set; }
+        [Required]
+        public UserRole Role { get; set; }
 
-        public int? ParentAdminId { get; set; }
-
+        /// <summary>
+        /// NULL = Nhánh 1 (User cá nhân). Bắt buộc với CompanyAdmin / CompanyStaff.
+        /// </summary>
         public int? CompanyId { get; set; }
 
         public bool IsActive { get; set; } = true;
 
-        [ForeignKey(nameof(ParentAdminId))]
-        public User? ParentAdmin { get; set; }
-
         [ForeignKey(nameof(CompanyId))]
         public Company? Company { get; set; }
 
-        public ICollection<User> Staffs { get; set; } = new List<User>();
         public ICollection<Category> OwnedCategories { get; set; } = new List<Category>();
         public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
         public ICollection<Wallet> Wallets { get; set; } = new List<Wallet>();

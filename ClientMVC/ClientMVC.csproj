@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -19,6 +19,7 @@
     <Folder Include="Areas\Personal\Controllers\" />
     <Folder Include="Areas\Personal\Views\Categories\" />
     <Folder Include="Areas\Personal\Views\Expenses\" />
+    <Folder Include="Controllers\" />
     <Folder Include="Models\Auth\" />
     <Folder Include="Models\Personal\" />
     <Folder Include="Services\" />

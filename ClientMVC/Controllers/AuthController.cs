@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using ClientMVC.Models.Auth;
+using ClientMVC.Models;
 using ClientMVC.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -10,20 +10,17 @@ namespace ClientMVC.Controllers
 {
     public class AuthController : Controller
     {
-        private readonly IAuthApiClient _authApiClient;
+        private readonly IAuthApiClient _authApi;
 
-        public AuthController(IAuthApiClient authApiClient)
+        public AuthController(IAuthApiClient authApi)
         {
-            _authApiClient = authApiClient;
+            _authApi = authApi;
         }
 
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Login(string? returnUrl = null)
         {
-            if (User.Identity?.IsAuthenticated == true)
-                return RedirectToDashboard();
-
             ViewData["ReturnUrl"] = returnUrl;
             return View(new LoginViewModel());
         }
@@ -36,28 +33,23 @@ namespace ClientMVC.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var (data, error) = await _authApiClient.LoginAsync(model);
-            if (data == null)
+            var (success, data, error) = await _authApi.LoginAsync(model);
+            if (!success || data == null)
             {
-                ModelState.AddModelError(string.Empty, error ?? "Đăng nhập thất bại.");
+                model.ErrorMessage = error ?? "Đăng nhập thất bại.";
                 return View(model);
             }
 
-            await SignInAsync(data);
-
-            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-                return Redirect(returnUrl);
-
-            return RedirectToDashboard(data.Role);
+            await SignInUserAsync(data);
+            if (data.Role == "User")
+                return RedirectToAction("Index", "Dashboard", new { area = "Personal" });
+            return RedirectToLocal(returnUrl);
         }
 
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Register()
         {
-            if (User.Identity?.IsAuthenticated == true)
-                return RedirectToDashboard();
-
             return View(new RegisterViewModel());
         }
 
@@ -69,42 +61,43 @@ namespace ClientMVC.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var (data, error) = await _authApiClient.RegisterAsync(model);
-            if (data == null)
+            var (success, data, error) = await _authApi.RegisterAsync(model);
+            if (!success || data == null)
             {
-                ModelState.AddModelError(string.Empty, error ?? "Đăng ký thất bại.");
+                model.ErrorMessage = error ?? "Đăng ký thất bại.";
                 return View(model);
             }
 
-            await SignInAsync(data);
-            return RedirectToPersonalExpenses();
+            await SignInUserAsync(data);
+            if (data.Role == "User")
+                return RedirectToAction("Index", "Dashboard", new { area = "Personal" });
+            return RedirectToAction("Index", "Home");
         }
 
-        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction(nameof(Login));
+            return RedirectToAction("Login");
         }
 
+        [HttpGet]
         [AllowAnonymous]
         public IActionResult AccessDenied() => View();
 
-        private async Task SignInAsync(AuthApiResponse data)
+        private async Task SignInUserAsync(AuthResult auth)
         {
             var claims = new List<Claim>
             {
-                new(ClaimTypes.NameIdentifier, data.UserId.ToString()),
-                new(ClaimTypes.Name, data.Username),
-                new(ClaimTypes.Email, data.Email),
-                new(ClaimTypes.Role, data.Role),
-                new("jwt", data.Token)
+                new(ClaimTypes.NameIdentifier, auth.UserId.ToString()),
+                new(ClaimTypes.Name, auth.Username),
+                new(ClaimTypes.Role, auth.Role),
+                new("access_token", auth.Token)
             };
 
-            if (!string.IsNullOrEmpty(data.FullName))
-                claims.Add(new Claim("FullName", data.FullName));
+            if (auth.CompanyId.HasValue)
+                claims.Add(new Claim("companyId", auth.CompanyId.Value.ToString()));
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(
@@ -117,20 +110,12 @@ namespace ClientMVC.Controllers
                 });
         }
 
-        private IActionResult RedirectToDashboard(string? role = null)
+        private IActionResult RedirectToLocal(string? returnUrl)
         {
-            role ??= User.FindFirstValue(ClaimTypes.Role);
-            return role switch
-            {
-                "User" => RedirectToPersonalExpenses(),
-                "Admin" => RedirectToAction("Dashboard", "Admin", new { area = "Corporate" }),
-                "Staff" => RedirectToAction("Calendar", "StaffExpenses", new { area = "Corporate" }),
-                _ => RedirectToAction(nameof(Login))
-            };
-        }
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
 
-        /// <summary>Nhánh 1: sau đăng nhập/đăng ký User vào CRUD chi tiêu cá nhân.</summary>
-        private IActionResult RedirectToPersonalExpenses() =>
-            RedirectToAction("Calendar", "Expenses", new { area = "Personal" });
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

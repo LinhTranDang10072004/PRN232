@@ -1,0 +1,36 @@
+@model List<CategoryDto>
+@{
+    ViewData["Title"] = "Danh mục";
+}
+
+<div class="d-flex justify-content-between mb-3">
+    <h2>🏷️ Danh mục chi tiêu</h2>
+    <a asp-action="Create" class="btn btn-primary">+ Thêm</a>
+</div>
+
+<div class="card shadow-sm">
+    <table class="table mb-0">
+        <thead><tr><th>Tên</th><th>Loại</th><th>Trạng thái</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Name</td>
+                <td>@(c.IsSystem ? "Hệ thống" : "Tự tạo")</td>
+                <td><span class="badge @(c.Status == BusinessObjects.Enums.CategoryStatus.Active ? "bg-success" : "bg-secondary")">@c.Status</span></td>
+                <td class="text-end">
+                    @if (c.CanEdit)
+                    {
+                        <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary">Sửa</a>
+                        <form asp-action="Deactivate" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@c.Id" />
+                            <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

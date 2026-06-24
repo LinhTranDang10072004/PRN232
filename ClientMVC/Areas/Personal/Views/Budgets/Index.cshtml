@@ -1,0 +1,39 @@
+@model List<BudgetDto>
+@{
+    ViewData["Title"] = "Budget";
+    var month = (int)ViewBag.Month;
+    var year = (int)ViewBag.Year;
+}
+
+<div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+    <h2>🎯 Budget tháng @month/@year</h2>
+    <div class="d-flex gap-2">
+        <a asp-action="Index" asp-route-month="@(month==1?12:month-1)" asp-route-year="@(month==1?year-1:year)" class="btn btn-outline-secondary btn-sm">‹</a>
+        <a asp-action="Index" asp-route-month="@DateTime.Today.Month" asp-route-year="@DateTime.Today.Year" class="btn btn-outline-primary btn-sm">Hôm nay</a>
+        <a asp-action="Index" asp-route-month="@(month==12?1:month+1)" asp-route-year="@(month==12?year+1:year)" class="btn btn-outline-secondary btn-sm">›</a>
+        <a asp-action="Create" class="btn btn-primary btn-sm">+ Tạo budget</a>
+    </div>
+</div>
+
+<div class="row g-3">
+@foreach (var b in Model)
+{
+    var pct = b.LimitAmount > 0 ? Math.Min(100, (int)(b.SpentAmount / b.LimitAmount * 100)) : 0;
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>@b.Name</h5>
+                <p class="text-muted small mb-2">@b.CategoryName</p>
+                <div class="progress mb-2" style="height:8px">
+                    <div class="progress-bar @(b.IsExceeded ? "bg-danger" : "bg-success")" style="width:@pct%"></div>
+                </div>
+                <div class="d-flex justify-content-between small">
+                    <span>Đã chi: <strong class="@(b.IsExceeded?"text-danger":"text-dark")">@b.SpentAmount.ToString("N0")</strong></span>
+                    <span>Còn: @b.RemainingAmount.ToString("N0") / @b.LimitAmount.ToString("N0")</span>
+                </div>
+                <a asp-action="EditLimit" asp-route-id="@b.Id" class="btn btn-sm btn-outline-primary mt-2">Sửa hạn mức</a>
+            </div>
+        </div>
+    </div>
+}
+</div>

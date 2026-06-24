@@ -24,15 +24,11 @@ builder.Services.AddHttpClient<IAuthApiClient, AuthApiClient>(client =>
     client.BaseAddress = new Uri(apiBaseUrl);
 });
 
+builder.Services.AddTransient<JwtBearerHandler>();
 builder.Services.AddHttpClient<IPersonalApiClient, PersonalApiClient>(client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl);
-});
-
-builder.Services.AddHttpClient<ICorporateApiClient, CorporateApiClient>(client =>
-{
-    client.BaseAddress = new Uri(apiBaseUrl);
-});
+}).AddHttpMessageHandler<JwtBearerHandler>();
 
 var app = builder.Build();
 

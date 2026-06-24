@@ -1,0 +1,14 @@
+@model CategoryFormModel
+@{ ViewData["Title"] = "Sửa danh mục"; }
+
+<h2>@ViewData["Title"]</h2>
+@if (!string.IsNullOrEmpty(Model.ErrorMessage)) { <div class="alert alert-danger">@Model.ErrorMessage</div> }
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="card p-4 shadow-sm" style="max-width:420px">
+    @Html.AntiForgeryToken()
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <button class="btn btn-primary">Lưu</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+</form>

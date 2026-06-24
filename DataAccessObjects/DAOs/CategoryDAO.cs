@@ -1,5 +1,6 @@
 using BusinessObjects.Enums;
 using BusinessObjects.Models;
+using BusinessObjects.Validation;
 using DataAccessObjects.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,27 +31,24 @@ namespace DataAccessObjects.DAOs
         public IQueryable<Category> GetQueryable(ExpenseDbContext context) =>
             context.Categories.AsNoTracking();
 
-        /// <summary>Danh mục Personal: hệ thống + do chính user tạo.</summary>
         public IQueryable<Category> ForPersonalUser(ExpenseDbContext context, int userId) =>
-            GetQueryable(context).Where(c =>
-                c.Branch == CategoryBranch.Personal &&
-                (c.OwnerUserId == null || c.OwnerUserId == userId));
+            CategoryScopeRules.ForPersonalUser(GetQueryable(context), userId);
 
-        public async Task<List<Category>> GetByBranchAsync(ExpenseDbContext context, CategoryBranch branch) =>
-            await context.Categories
-                .Where(c => c.Branch == branch)
-                .AsNoTracking()
-                .ToListAsync();
+        public IQueryable<Category> ForCorporateCompany(ExpenseDbContext context, int companyId) =>
+            CategoryScopeRules.ForCorporateCompany(GetQueryable(context), companyId);
+
+        public IQueryable<Category> ForPersonalUserManage(ExpenseDbContext context, int userId) =>
+            CategoryScopeRules.ForPersonalUserManage(GetQueryable(context), userId);
 
         public async Task<Category?> GetByIdAsync(ExpenseDbContext context, int id) =>
             await context.Categories.FindAsync(id);
 
-        public async Task<bool> NameExistsForUserAsync(
+        public async Task<bool> NameExistsForPersonalUserAsync(
             ExpenseDbContext context, int userId, string name, int? excludeId = null)
         {
             var normalized = name.Trim();
             return await context.Categories.AnyAsync(c =>
-                c.Branch == CategoryBranch.Personal &&
+                c.CompanyId == null &&
                 c.OwnerUserId == userId &&
                 c.Name == normalized &&
                 (excludeId == null || c.Id != excludeId));

@@ -1,0 +1,132 @@
+@model CalendarMonthViewModel
+@using ClientMVC.Helpers
+@{
+    ViewData["Title"] = "Lịch chi tiêu";
+    var (prevY, prevM) = CalendarHelper.ShiftMonth(Model.Year, Model.Month, -1);
+    var (nextY, nextM) = CalendarHelper.ShiftMonth(Model.Year, Model.Month, 1);
+    var headers = CalendarHelper.GetWeekdayHeaders();
+}
+
+<div class="calendar-header d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h2 class="mb-0">📅 @Model.MonthLabel</h2>
+        <p class="text-muted mb-0">
+            @Model.ExpenseCount khoản · Tổng <strong class="text-danger">@Model.MonthTotal.ToString("N0") đ</strong>
+        </p>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+        <a asp-action="Calendar" asp-route-year="@prevY" asp-route-month="@prevM" class="btn btn-outline-secondary">‹ Tháng trước</a>
+        <a asp-action="Calendar" asp-route-year="@DateTime.Today.Year" asp-route-month="@DateTime.Today.Month" class="btn btn-outline-primary btn-sm">Hôm nay</a>
+        <a asp-action="Calendar" asp-route-year="@nextY" asp-route-month="@nextM" class="btn btn-outline-secondary">Tháng sau ›</a>
+        <a asp-action="Create" asp-controller="Expenses" class="btn btn-primary">+ Thêm chi</a>
+    </div>
+</div>
+
+<div class="expense-calendar shadow-sm">
+    <div class="calendar-weekdays">
+        @foreach (var h in headers)
+        {
+            <div class="calendar-weekday">@h</div>
+        }
+    </div>
+
+    @foreach (var week in Model.Weeks)
+    {
+        <div class="calendar-week">
+            @foreach (var day in week.Days)
+            {
+                if (!day.IsCurrentMonth)
+                {
+                    <div class="calendar-day calendar-day-empty"></div>
+                    continue;
+                }
+
+                var isSelected = Model.SelectedDay == day.Day;
+                <a asp-action="Calendar"
+                   asp-route-year="@Model.Year"
+                   asp-route-month="@Model.Month"
+                   asp-route-day="@day.Day"
+                   class="calendar-day @(day.IsToday ? "calendar-day-today" : "") @(isSelected ? "calendar-day-selected" : "") @(day.DayTotal > 0 ? "calendar-day-has-expense" : "")">
+                    <div class="calendar-day-number">@day.Day</div>
+                    @if (day.DayTotal > 0)
+                    {
+                        <div class="calendar-day-total">@day.DayTotal.ToString("N0")</div>
+                    }
+                    <div class="calendar-day-items">
+                        @foreach (var exp in day.Expenses.Take(3))
+                        {
+                            <div class="calendar-expense-chip" title="@exp.Title - @exp.Amount.ToString("N0")">
+                                @exp.Title
+                            </div>
+                        }
+                        @if (day.Expenses.Count > 3)
+                        {
+                            <div class="calendar-more">+@(day.Expenses.Count - 3) khoản</div>
+                        }
+                    </div>
+                </a>
+            }
+        </div>
+    }
+</div>
+
+@if (Model.SelectedDay.HasValue)
+{
+    <div class="card mt-4 shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Chi tiêu ngày @Model.SelectedDay/@Model.Month/@Model.Year</span>
+            <a asp-action="Create" asp-route-date="@($"{Model.Year}-{Model.Month:D2}-{Model.SelectedDay:D2}")" class="btn btn-sm btn-primary">+ Thêm</a>
+        </div>
+        <div class="card-body p-0">
+            @if (!Model.SelectedDayExpenses.Any())
+            {
+                <p class="p-3 text-muted mb-0">Không có khoản chi trong ngày này.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Tiêu đề</th>
+                                <th>Danh mục</th>
+                                <th>Ví</th>
+                                <th class="text-end">Số tiền</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var e in Model.SelectedDayExpenses)
+                            {
+                                <tr>
+                                    <td>@e.Title</td>
+                                    <td>@e.CategoryName</td>
+                                    <td>@(e.WalletName ?? "—")</td>
+                                    <td class="text-end text-danger fw-semibold">@e.Amount.ToString("N0")</td>
+                                    <td class="text-end text-nowrap">
+                                        <a asp-action="Edit" asp-route-id="@e.Id" class="btn btn-sm btn-outline-primary">Sửa</a>
+                                        <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Xóa khoản chi này?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@e.Id" />
+                                            <input type="hidden" name="year" value="@Model.Year" />
+                                            <input type="hidden" name="month" value="@Model.Month" />
+                                            <input type="hidden" name="day" value="@Model.SelectedDay" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-light">
+                                <td colspan="3" class="fw-semibold">Tổng ngày</td>
+                                <td class="text-end fw-bold text-danger">@Model.SelectedDayExpenses.Sum(x => x.Amount).ToString("N0")</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+}

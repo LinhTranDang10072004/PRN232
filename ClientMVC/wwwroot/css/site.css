@@ -1,22 +1,176 @@
 html {
   font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
   position: relative;
   min-height: 100%;
 }
 
+@media (min-width: 768px) {
+  html { font-size: 16px; }
+}
+
 body {
   margin-bottom: 60px;
+  background: #f4f6f9;
+}
+
+.personal-sidebar {
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+  min-height: calc(100vh - 56px);
+}
+
+.personal-nav .nav-link {
+  color: #374151;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  padding: 0.55rem 0.85rem;
+}
+
+.personal-nav .nav-link:hover {
+  background: #eef2ff;
+  color: #1d4ed8;
+}
+
+.personal-nav .nav-link-highlight {
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.personal-main {
+  min-height: calc(100vh - 56px);
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+}
+
+/* ===== Expense Calendar ===== */
+.expense-calendar {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.calendar-weekdays,
+.calendar-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #6b7280;
+  padding: 0.75rem 0.25rem;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.calendar-week {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.calendar-week:last-child {
+  border-bottom: none;
+}
+
+.calendar-day,
+.calendar-day-empty {
+  min-height: 110px;
+  border-right: 1px solid #f3f4f6;
+  padding: 0.35rem;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: background 0.15s;
+}
+
+.calendar-day:last-child,
+.calendar-day-empty:last-child {
+  border-right: none;
+}
+
+.calendar-day:hover {
+  background: #f0f9ff;
+}
+
+.calendar-day-today {
+  background: #eff6ff;
+}
+
+.calendar-day-today .calendar-day-number {
+  background: #2563eb;
+  color: #fff;
+  border-radius: 50%;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendar-day-selected {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
+  background: #f0f9ff;
+}
+
+.calendar-day-has-expense {
+  background: #fefefe;
+}
+
+.calendar-day-number {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.15rem;
+}
+
+.calendar-day-total {
+  font-size: 0.72rem;
+  color: #dc2626;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.calendar-expense-chip {
+  font-size: 0.68rem;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 4px;
+  padding: 1px 4px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calendar-more {
+  font-size: 0.65rem;
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .calendar-day,
+  .calendar-day-empty {
+    min-height: 72px;
+  }
+
+  .calendar-expense-chip {
+    display: none;
+  }
+
+  .personal-sidebar {
+    min-height: auto;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .personal-nav {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
 }

@@ -31,12 +31,14 @@ namespace DataAccessObjects.DAOs
             context.Expenses
                 .Include(e => e.Category)
                 .Include(e => e.User)
+                .Include(e => e.Wallet)
                 .AsNoTracking();
 
         public async Task<Expense?> GetByIdAsync(ExpenseDbContext context, int id) =>
             await context.Expenses
                 .Include(e => e.Category)
                 .Include(e => e.User)
+                .Include(e => e.Wallet)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
         public async Task AddAsync(ExpenseDbContext context, Expense expense)
@@ -61,14 +63,15 @@ namespace DataAccessObjects.DAOs
         public IQueryable<Expense> ForPersonalUser(ExpenseDbContext context, int userId) =>
             GetQueryable(context).Where(e => e.UserId == userId);
 
-        /// <summary>Nhánh 2 Staff: chỉ chi tiêu của Staff đó.</summary>
+        /// <summary>Nhánh 2 Staff: chi tiêu của chính Staff.</summary>
         public IQueryable<Expense> ForStaff(ExpenseDbContext context, int staffId) =>
             GetQueryable(context).Where(e => e.UserId == staffId);
 
-        /// <summary>Nhánh 2 Admin: toàn bộ chi tiêu Staff thuộc workspace.</summary>
-        public IQueryable<Expense> ForAdminWorkspace(ExpenseDbContext context, int adminId) =>
+        /// <summary>Nhánh 2 Admin: chi tiêu của mọi Staff cùng CompanyId.</summary>
+        public IQueryable<Expense> ForAdminCompany(ExpenseDbContext context, int companyId) =>
             GetQueryable(context).Where(e =>
-                e.User.Role == UserRole.Staff &&
-                e.User.ParentAdminId == adminId);
+                e.User != null &&
+                e.User.Role == UserRole.CompanyStaff &&
+                e.User.CompanyId == companyId);
     }
 }

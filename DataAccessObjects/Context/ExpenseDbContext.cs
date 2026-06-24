@@ -1,3 +1,4 @@
+using BusinessObjects.Enums;
 using BusinessObjects.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,14 +38,12 @@ namespace DataAccessObjects.Context
                 entity.Property(u => u.Password).HasMaxLength(255);
                 entity.Property(u => u.Email).HasMaxLength(100);
                 entity.Property(u => u.FullName).HasMaxLength(255);
-                entity.Property(u => u.Role).HasMaxLength(50);
+                entity.Property(u => u.Role)
+                    .HasConversion<string>()
+                    .HasMaxLength(50);
 
                 entity.HasIndex(u => u.UserName).IsUnique();
-
-                entity.HasOne(u => u.ParentAdmin)
-                    .WithMany(u => u.Staffs)
-                    .HasForeignKey(u => u.ParentAdminId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(u => new { u.CompanyId, u.Role });
 
                 entity.HasOne(u => u.Company)
                     .WithMany(c => c.Users)
@@ -66,9 +65,12 @@ namespace DataAccessObjects.Context
             modelBuilder.Entity<Category>(entity =>
             {
                 entity.Property(c => c.Name).HasMaxLength(255);
-                entity.Property(c => c.Branch).HasMaxLength(100);
                 entity.Property(c => c.Type).HasMaxLength(50);
-                entity.Property(c => c.Status).HasMaxLength(50);
+                entity.Property(c => c.Status)
+                    .HasConversion<string>()
+                    .HasMaxLength(50);
+
+                entity.HasIndex(c => new { c.Name, c.CompanyId, c.OwnerUserId });
 
                 entity.HasOne(c => c.OwnerUser)
                     .WithMany(u => u.OwnedCategories)
@@ -136,11 +138,21 @@ namespace DataAccessObjects.Context
             {
                 entity.Property(e => e.Title).HasMaxLength(255);
                 entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
-                entity.Property(e => e.Status).HasMaxLength(50);
+                entity.Property(e => e.Status)
+                    .HasConversion<string>()
+                    .HasMaxLength(50);
+
+                entity.HasIndex(e => e.UserId);
+                entity.HasIndex(e => e.Status);
 
                 entity.HasOne(e => e.User)
                     .WithMany(u => u.Expenses)
                     .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Category)
+                    .WithMany(c => c.Expenses)
+                    .HasForeignKey(e => e.CategoryId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(e => e.BudgetDetail)
@@ -178,6 +190,19 @@ namespace DataAccessObjects.Context
                     .HasForeignKey(h => h.AccountId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
+
+            SeedPersonalCategories(modelBuilder);
+        }
+
+        private static void SeedPersonalCategories(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Category>().HasData(
+                new Category { Id = 1, Name = "Ăn uống", Status = CategoryStatus.Active, CompanyId = null, OwnerUserId = null },
+                new Category { Id = 2, Name = "Di chuyển", Status = CategoryStatus.Active, CompanyId = null, OwnerUserId = null },
+                new Category { Id = 3, Name = "Mua sắm", Status = CategoryStatus.Active, CompanyId = null, OwnerUserId = null },
+                new Category { Id = 4, Name = "Giải trí", Status = CategoryStatus.Active, CompanyId = null, OwnerUserId = null },
+                new Category { Id = 5, Name = "Khác (cá nhân)", Status = CategoryStatus.Active, CompanyId = null, OwnerUserId = null }
+            );
         }
     }
 }

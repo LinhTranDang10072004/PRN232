@@ -1,6 +1,7 @@
 using System.Text;
 using DataAccessObjects.Context;
-using ExpenseManagementAPI.Services;
+using ExpenseManagementAPI;
+using ExpenseManagementAPI.Services.Implement;
 using ExpenseManagementAPI.Services.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.OData;
@@ -15,14 +16,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ExpenseDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
-builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<IWalletRepository, WalletRepository>();
+builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPersonalWalletService, PersonalWalletService>();
 builder.Services.AddScoped<IPersonalCategoryService, PersonalCategoryService>();
+builder.Services.AddScoped<IPersonalBudgetService, PersonalBudgetService>();
 builder.Services.AddScoped<IPersonalExpenseService, PersonalExpenseService>();
-builder.Services.AddScoped<ICorporateExpenseService, CorporateExpenseService>();
-builder.Services.AddScoped<ICorporateStaffService, CorporateStaffService>();
+builder.Services.AddScoped<IPersonalReportService, PersonalReportService>();
+builder.Services.AddScoped<IPersonalNotificationService, PersonalNotificationService>();
+builder.Services.AddScoped<IPersonalNotificationQueryService, PersonalNotificationQueryService>();
 builder.Services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 

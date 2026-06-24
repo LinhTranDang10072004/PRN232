@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BusinessObjects.Enums;
 
 namespace BusinessObjects.Models
 {
@@ -21,10 +22,12 @@ namespace BusinessObjects.Models
 
         public DateTime? ExpenseDate { get; set; }
 
-        [StringLength(50)]
-        public string? Status { get; set; }
+        [Required]
+        public ExpenseStatus Status { get; set; } = ExpenseStatus.Pending;
 
         public int? UserId { get; set; }
+
+        public int? CategoryId { get; set; }
 
         public int? BudgetDetailId { get; set; }
 
@@ -36,6 +39,9 @@ namespace BusinessObjects.Models
 
         [ForeignKey(nameof(UserId))]
         public User? User { get; set; }
+
+        [ForeignKey(nameof(CategoryId))]
+        public Category? Category { get; set; }
 
         [ForeignKey(nameof(BudgetDetailId))]
         public BudgetDetail? BudgetDetail { get; set; }
