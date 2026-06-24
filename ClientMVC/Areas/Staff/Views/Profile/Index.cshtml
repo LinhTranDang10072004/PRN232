@@ -1,0 +1,15 @@
+@model ProfileFormModel
+@{ ViewData["Title"] = "Hồ sơ"; }
+
+<h2>👤 Hồ sơ nhân viên</h2>
+@if (!string.IsNullOrEmpty(Model.SuccessMessage)) { <div class="alert alert-success">@Model.SuccessMessage</div> }
+@if (!string.IsNullOrEmpty(Model.ErrorMessage)) { <div class="alert alert-danger">@Model.ErrorMessage</div> }
+
+<form asp-action="Index" method="post" class="card p-4 shadow-sm mb-4" style="max-width:480px">
+    @Html.AntiForgeryToken()
+    <div class="mb-3"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" /></div>
+    <button class="btn btn-success">Cập nhật</button>
+</form>
+
+<p><a asp-action="ChangePassword" class="btn btn-outline-secondary">Đổi mật khẩu</a></p>

@@ -1,0 +1,80 @@
+@model StaffExpenseDto
+@{
+    ViewData["Title"] = "Chi tiết phiếu chi";
+    string StatusBadge(ExpenseStatus s) => s switch
+    {
+        ExpenseStatus.Pending => "warning",
+        ExpenseStatus.Approved => "success",
+        ExpenseStatus.Rejected => "danger",
+        _ => "secondary"
+    };
+    string StatusText(ExpenseStatus s) => s switch
+    {
+        ExpenseStatus.Pending => "Chờ duyệt",
+        ExpenseStatus.Approved => "Đã duyệt",
+        ExpenseStatus.Rejected => "Từ chối",
+        _ => s.ToString()
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Chi tiết phiếu chi</h2>
+    <div class="d-flex gap-2">
+        @if (Model.Status != ExpenseStatus.Approved)
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary">Sửa</a>
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Xóa phiếu chi này?');">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-danger">Xóa</button>
+            </form>
+        }
+        <a asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
+    </div>
+</div>
+
+<div class="card shadow-sm p-4 mb-4" style="max-width:720px">
+    <div class="mb-2"><span class="badge bg-@StatusBadge(Model.Status)">@StatusText(Model.Status)</span></div>
+    <h4>@Model.Title</h4>
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <p class="text-muted">@Model.Description</p>
+    }
+    <dl class="row mb-0">
+        <dt class="col-sm-4">Số tiền</dt>
+        <dd class="col-sm-8 fw-bold">@Model.Amount.ToString("N0") đ</dd>
+        <dt class="col-sm-4">Ngày chi</dt>
+        <dd class="col-sm-8">@(Model.ExpenseDate?.ToString("dd/MM/yyyy") ?? "—")</dd>
+        <dt class="col-sm-4">Danh mục</dt>
+        <dd class="col-sm-8">@Model.CategoryName</dd>
+        <dt class="col-sm-4">Tài khoản</dt>
+        <dd class="col-sm-8">@(Model.AccountName) (@Model.AccountNumber)</dd>
+        <dt class="col-sm-4">Ngày tạo</dt>
+        <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
+    </dl>
+</div>
+
+@if (Model.ApprovalHistories.Any())
+{
+    <div class="card shadow-sm" style="max-width:720px">
+        <div class="card-header fw-semibold">Lịch sử duyệt</div>
+        <ul class="list-group list-group-flush">
+            @foreach (var h in Model.ApprovalHistories)
+            {
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <strong>@(h.Action == "Approved" ? "✅ Duyệt" : h.Action == "Rejected" ? "❌ Từ chối" : h.Action)</strong>
+                        <small class="text-muted">@h.ActionDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</small>
+                    </div>
+                    @if (!string.IsNullOrEmpty(h.AdminName))
+                    {
+                        <div class="small text-muted">Bởi: @h.AdminName</div>
+                    }
+                    @if (!string.IsNullOrEmpty(h.Comment))
+                    {
+                        <div class="small mt-1">@h.Comment</div>
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+}

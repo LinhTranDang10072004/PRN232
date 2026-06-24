@@ -9,7 +9,7 @@ namespace DataAccessObjects.Context
         {
             var optionsBuilder = new DbContextOptionsBuilder<ExpenseDbContext>();
             optionsBuilder.UseSqlServer(
-                "Server=LAPTOP-715LSPJN;uid=sa;password=123;database=ExpenseManagement;Encrypt=True;TrustServerCertificate=True;");
+                "Server=127.0.0.1,1433;uid=sa;password=YourStrong!Passw0rd;database=ExpenseManagement;Encrypt=True;TrustServerCertificate=True;");
             return new ExpenseDbContext(optionsBuilder.Options);
         }
     }

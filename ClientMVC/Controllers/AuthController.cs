@@ -43,6 +43,8 @@ namespace ClientMVC.Controllers
             await SignInUserAsync(data);
             if (data.Role == "User")
                 return RedirectToAction("Index", "Dashboard", new { area = "Personal" });
+            if (data.Role == "Staff")
+                return RedirectToAction("Index", "Dashboard", new { area = "Staff" });
             return RedirectToLocal(returnUrl);
         }
 

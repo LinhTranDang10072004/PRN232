@@ -19,6 +19,7 @@ builder.Services.AddDbContext<ExpenseDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IWalletRepository, WalletRepository>();
 builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
@@ -30,6 +31,10 @@ builder.Services.AddScoped<IPersonalExpenseService, PersonalExpenseService>();
 builder.Services.AddScoped<IPersonalReportService, PersonalReportService>();
 builder.Services.AddScoped<IPersonalNotificationService, PersonalNotificationService>();
 builder.Services.AddScoped<IPersonalNotificationQueryService, PersonalNotificationQueryService>();
+builder.Services.AddScoped<IStaffExpenseService, StaffExpenseService>();
+builder.Services.AddScoped<IStaffCategoryService, StaffCategoryService>();
+builder.Services.AddScoped<IStaffAccountService, StaffAccountService>();
+builder.Services.AddScoped<IStaffNotificationQueryService, StaffNotificationQueryService>();
 builder.Services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
