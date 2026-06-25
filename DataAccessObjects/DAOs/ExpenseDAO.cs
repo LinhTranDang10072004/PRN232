@@ -32,7 +32,17 @@ namespace DataAccessObjects.DAOs
                 .Include(e => e.Category)
                 .Include(e => e.User)
                 .Include(e => e.Wallet)
+                .Include(e => e.Account)
                 .AsNoTracking();
+
+        public async Task<Expense?> GetByIdForStaffAsync(ExpenseDbContext context, int staffId, int id) =>
+            await context.Expenses
+                .Include(e => e.Category)
+                .Include(e => e.Account)
+                .Include(e => e.ApprovalHistories)
+                    .ThenInclude(h => h.Admin)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Id == id && e.UserId == staffId);
 
         public async Task<Expense?> GetByIdAsync(ExpenseDbContext context, int id) =>
             await context.Expenses

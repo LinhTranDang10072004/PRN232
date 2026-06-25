@@ -11,5 +11,13 @@ namespace ExpenseManagementAPI.Helpers
                 throw new UnauthorizedAccessException("Không xác định được người dùng.");
             return userId;
         }
+
+        public static int GetCompanyId(this ClaimsPrincipal user)
+        {
+            var value = user.FindFirstValue("companyId");
+            if (value == null || !int.TryParse(value, out var companyId))
+                throw new UnauthorizedAccessException("Không xác định được công ty.");
+            return companyId;
+        }
     }
 }

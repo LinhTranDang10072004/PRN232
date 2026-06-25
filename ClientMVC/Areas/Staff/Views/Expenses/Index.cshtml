@@ -1,0 +1,66 @@
+@model List<StaffExpenseDto>
+@{
+    ViewData["Title"] = "Danh sách phiếu chi";
+    string StatusBadge(ExpenseStatus s) => s switch
+    {
+        ExpenseStatus.Pending => "warning",
+        ExpenseStatus.Approved => "success",
+        ExpenseStatus.Rejected => "danger",
+        _ => "secondary"
+    };
+    string StatusText(ExpenseStatus s) => s switch
+    {
+        ExpenseStatus.Pending => "Chờ duyệt",
+        ExpenseStatus.Approved => "Đã duyệt",
+        ExpenseStatus.Rejected => "Từ chối",
+        _ => s.ToString()
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>📋 Phiếu chi của tôi</h2>
+    <a asp-action="Create" class="btn btn-success">+ Tạo phiếu chi</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Ngày</th>
+                    <th>Tiêu đề</th>
+                    <th>Danh mục</th>
+                    <th>Tài khoản</th>
+                    <th class="text-end">Số tiền</th>
+                    <th>Trạng thái</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model)
+                {
+                    <tr>
+                        <td>@(e.ExpenseDate?.ToString("dd/MM/yyyy") ?? "—")</td>
+                        <td>@e.Title</td>
+                        <td>@e.CategoryName</td>
+                        <td>@(e.AccountName ?? e.AccountNumber ?? "—")</td>
+                        <td class="text-end">@e.Amount.ToString("N0") đ</td>
+                        <td><span class="badge bg-@StatusBadge(e.Status)">@StatusText(e.Status)</span></td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@e.Id" class="btn btn-sm btn-outline-secondary">Chi tiết</a>
+                            @if (e.Status != ExpenseStatus.Approved)
+                            {
+                                <a asp-action="Edit" asp-route-id="@e.Id" class="btn btn-sm btn-outline-primary">Sửa</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <p class="text-muted mt-3">Chưa có phiếu chi nào. <a asp-action="Create">Tạo phiếu chi đầu tiên</a></p>
+}
