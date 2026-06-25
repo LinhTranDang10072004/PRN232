@@ -118,8 +118,9 @@ namespace ClientMVC.Models.Personal
         [Display(Name = "Danh mục")]
         public int CategoryId { get; set; }
 
+        [Required]
         [Display(Name = "Ví")]
-        public int? WalletId { get; set; }
+        public int WalletId { get; set; }
 
         public string? ErrorMessage { get; set; }
     }

@@ -1,6 +1,7 @@
 using BusinessObjects.Enums;
 using BusinessObjects.Models;
 using BusinessObjects.Validation;
+using DataAccessObjects.Context;
 using ExpenseManagementAPI.DTOs.Personal;
 using ExpenseManagementAPI.Services.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ namespace ExpenseManagementAPI.Services.Implement
 {
     public class PersonalExpenseService : IPersonalExpenseService
     {
+        private readonly ExpenseDbContext _context;
         private readonly IExpenseRepository _expenseRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IWalletRepository _walletRepository;
@@ -17,12 +19,14 @@ namespace ExpenseManagementAPI.Services.Implement
         private readonly IPersonalNotificationService _notificationService;
 
         public PersonalExpenseService(
+            ExpenseDbContext context,
             IExpenseRepository expenseRepository,
             ICategoryRepository categoryRepository,
             IWalletRepository walletRepository,
             IBudgetRepository budgetRepository,
             IPersonalNotificationService notificationService)
         {
+            _context = context;
             _expenseRepository = expenseRepository;
             _categoryRepository = categoryRepository;
             _walletRepository = walletRepository;
@@ -62,112 +66,200 @@ namespace ExpenseManagementAPI.Services.Implement
             if (!valid)
                 return (false, null, error);
 
-            var expenseDate = request.ExpenseDate ?? DateTime.UtcNow;
-            var expense = new Expense
+            await using var tx = await _context.Database.BeginTransactionAsync();
+            try
             {
-                Title = request.Title.Trim(),
-                Description = request.Description?.Trim(),
-                Amount = request.Amount,
-                ExpenseDate = expenseDate,
-                CategoryId = request.CategoryId,
-                WalletId = request.WalletId,
-                UserId = userId,
-                Status = ExpenseStatusRules.InitialStatusForRole(UserRole.User),
-                CreatedAt = DateTime.UtcNow
-            };
+                var expense = new Expense
+                {
+                    Title = request.Title.Trim(),
+                    Description = request.Description?.Trim(),
+                    Amount = request.Amount,
+                    ExpenseDate = request.ExpenseDate,
+                    CategoryId = request.CategoryId,
+                    WalletId = request.WalletId,
+                    UserId = userId,
+                    Status = ExpenseStatusRules.InitialStatusForRole(UserRole.User),
+                    CreatedAt = DateTime.UtcNow
+                };
 
-            await ApplyBudgetLinkAsync(userId, expense, expenseDate);
-            if (request.WalletId.HasValue)
-                await DeductWalletAsync(userId, request.WalletId.Value, request.Amount);
+                var (walletOk, walletError) = await DeductWalletAsync(userId, request.WalletId, request.Amount);
+                if (!walletOk)
+                {
+                    await tx.RollbackAsync();
+                    return (false, null, walletError);
+                }
 
-            await _expenseRepository.AddAsync(expense);
-            await _notificationService.NotifyAsync(userId, "Tạo khoản chi thành công",
-                $"Đã ghi nhận \"{expense.Title}\" - {expense.Amount:N0}.");
+                var (budgetOk, budgetError) = await ApplyBudgetLinkAsync(userId, expense, request);
+                if (!budgetOk)
+                {
+                    await tx.RollbackAsync();
+                    return (false, null, budgetError);
+                }
 
-            if (expense.BudgetDetailId.HasValue)
-                await NotifyBudgetAsync(userId, expense);
+                await _expenseRepository.AddAsync(expense);
+                await tx.CommitAsync();
 
-            var created = await _expenseRepository.GetByIdForPersonalUserAsync(userId, expense.Id);
-            return (true, Map(created!), null);
+                await _notificationService.NotifyAsync(userId, "Tạo khoản chi thành công",
+                    $"Đã ghi nhận \"{expense.Title}\" - {expense.Amount:N0}.");
+
+                if (expense.BudgetDetailId.HasValue)
+                    await NotifyBudgetAsync(userId, expense.BudgetDetailId.Value);
+
+                var created = await _expenseRepository.GetByIdForPersonalUserAsync(userId, expense.Id);
+                return (true, Map(created!), null);
+            }
+            catch
+            {
+                await tx.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<(bool Success, ExpenseResponse? Data, string? Error)> UpdateAsync(
             int userId, int id, ExpenseRequest request)
         {
-            var expense = await _expenseRepository.GetByIdTrackedAsync(id);
-            if (expense == null || expense.UserId != userId)
-                return (false, null, "Không tìm thấy khoản chi.");
-
             var (valid, error) = await ValidateRequestAsync(userId, request);
             if (!valid)
                 return (false, null, error);
 
-            await ReverseEffectsAsync(userId, expense);
+            await using var tx = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var expense = await _expenseRepository.GetByIdTrackedAsync(id);
+                if (expense == null || expense.UserId != userId)
+                {
+                    await tx.RollbackAsync();
+                    return (false, null, "Không tìm thấy khoản chi.");
+                }
 
-            expense.Title = request.Title.Trim();
-            expense.Description = request.Description?.Trim();
-            expense.Amount = request.Amount;
-            expense.ExpenseDate = request.ExpenseDate ?? expense.ExpenseDate;
-            expense.CategoryId = request.CategoryId;
-            expense.WalletId = request.WalletId;
-            expense.BudgetDetailId = null;
+                // Hoàn tác hiệu ứng cũ (ví + budget)
+                await ReverseEffectsAsync(userId, expense);
 
-            var expenseDate = expense.ExpenseDate ?? DateTime.UtcNow;
-            await ApplyBudgetLinkAsync(userId, expense, expenseDate);
-            if (request.WalletId.HasValue)
-                await DeductWalletAsync(userId, request.WalletId.Value, request.Amount);
+                expense.Title = request.Title.Trim();
+                expense.Description = request.Description?.Trim();
+                expense.Amount = request.Amount;
+                expense.ExpenseDate = request.ExpenseDate;
+                expense.CategoryId = request.CategoryId;
+                expense.WalletId = request.WalletId;
+                expense.BudgetDetailId = null;
 
-            await _expenseRepository.UpdateAsync(expense);
-            if (expense.BudgetDetailId.HasValue)
-                await NotifyBudgetAsync(userId, expense);
+                var (walletOk, walletError) = await DeductWalletAsync(userId, request.WalletId, request.Amount);
+                if (!walletOk)
+                {
+                    await tx.RollbackAsync();
+                    return (false, null, walletError);
+                }
 
-            var updated = await _expenseRepository.GetByIdForPersonalUserAsync(userId, id);
-            return (true, Map(updated!), null);
+                var (budgetOk, budgetError) = await ApplyBudgetLinkAsync(userId, expense, request);
+                if (!budgetOk)
+                {
+                    await tx.RollbackAsync();
+                    return (false, null, budgetError);
+                }
+
+                await _expenseRepository.UpdateAsync(expense);
+                await tx.CommitAsync();
+
+                if (expense.BudgetDetailId.HasValue)
+                    await NotifyBudgetAsync(userId, expense.BudgetDetailId.Value);
+
+                var updated = await _expenseRepository.GetByIdForPersonalUserAsync(userId, id);
+                return (true, Map(updated!), null);
+            }
+            catch
+            {
+                await tx.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<(bool Success, string? Error)> DeleteAsync(int userId, int id)
         {
-            var expense = await _expenseRepository.GetByIdTrackedAsync(id);
-            if (expense == null || expense.UserId != userId)
-                return (false, "Không tìm thấy khoản chi.");
+            await using var tx = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var expense = await _expenseRepository.GetByIdTrackedAsync(id);
+                if (expense == null || expense.UserId != userId)
+                {
+                    await tx.RollbackAsync();
+                    return (false, "Không tìm thấy khoản chi.");
+                }
 
-            await ReverseEffectsAsync(userId, expense);
-            await _expenseRepository.DeleteAsync(expense);
-            return (true, null);
+                await ReverseEffectsAsync(userId, expense);
+                await _expenseRepository.DeleteAsync(expense);
+                await tx.CommitAsync();
+                return (true, null);
+            }
+            catch
+            {
+                await tx.RollbackAsync();
+                throw;
+            }
         }
 
         private async Task<(bool Valid, string? Error)> ValidateRequestAsync(int userId, ExpenseRequest request)
         {
+            if (string.IsNullOrWhiteSpace(request.Title))
+                return (false, "Tiêu đề không được rỗng.");
+
+            if (request.Amount <= 0)
+                return (false, "Số tiền chi phải lớn hơn 0.");
+
             var categories = _categoryRepository.GetForPersonalUser(userId);
             if (!await categories.AnyAsync(c => c.Id == request.CategoryId))
                 return (false, "Danh mục không hợp lệ.");
 
-            if (request.WalletId.HasValue)
+            var wallet = await _walletRepository.GetByIdForUserAsync(userId, request.WalletId);
+            if (wallet == null || wallet.Status == "Inactive")
+                return (false, "Ví không hợp lệ.");
+
+            if (request.BudgetDetailId.HasValue)
             {
-                var wallet = await _walletRepository.GetByIdForUserAsync(userId, request.WalletId.Value);
-                if (wallet == null || wallet.Status == "Inactive")
-                    return (false, "Ví không hợp lệ.");
+                var detail = await _budgetRepository.GetDetailByIdAsync(request.BudgetDetailId.Value);
+                if (detail?.Budget == null || detail.Budget.UserId != userId)
+                    return (false, "BudgetDetail không hợp lệ.");
+
+                if (!PersonalExpenseRules.ExpenseDateMatchesBudget(
+                        request.ExpenseDate, detail.Budget.Month, detail.Budget.Year))
+                    return (false, "Ngày chi không khớp tháng/năm của budget.");
             }
 
             return (true, null);
         }
 
-        private async Task ApplyBudgetLinkAsync(int userId, Expense expense, DateTime expenseDate)
+        private async Task<(bool Ok, string? Error)> ApplyBudgetLinkAsync(
+            int userId, Expense expense, ExpenseRequest request)
         {
-            if (!expense.CategoryId.HasValue)
-                return;
+            BudgetDetail? detail;
 
-            var budget = await _budgetRepository.FindForMonthAsync(
-                userId, expense.CategoryId.Value, expenseDate.Month, expenseDate.Year);
+            if (request.BudgetDetailId.HasValue)
+            {
+                detail = await _budgetRepository.GetDetailByIdAsync(request.BudgetDetailId.Value);
+                if (detail?.Budget == null || detail.Budget.UserId != userId)
+                    return (false, "BudgetDetail không hợp lệ.");
+            }
+            else
+            {
+                if (!expense.CategoryId.HasValue)
+                    return (true, null);
 
-            var detail = budget?.Details.FirstOrDefault();
-            if (detail == null)
-                return;
+                var budget = await _budgetRepository.FindForMonthAsync(
+                    userId, expense.CategoryId.Value, request.ExpenseDate.Month, request.ExpenseDate.Year);
+
+                detail = budget?.Details.FirstOrDefault();
+                if (detail == null)
+                    return (true, null);
+            }
+
+            if (!PersonalExpenseRules.ExpenseDateMatchesBudget(
+                    request.ExpenseDate, detail.Budget?.Month, detail.Budget?.Year))
+                return (false, "Ngày chi không khớp tháng/năm của budget.");
 
             detail.CurrentAmount += expense.Amount;
             detail.UpdatedAt = DateTime.UtcNow;
             expense.BudgetDetailId = detail.Id;
             await _budgetRepository.UpdateDetailAsync(detail);
+            return (true, null);
         }
 
         private async Task ReverseEffectsAsync(int userId, Expense expense)
@@ -189,14 +281,19 @@ namespace ExpenseManagementAPI.Services.Implement
                 await RefundWalletAsync(userId, expense.WalletId.Value, expense.Amount);
         }
 
-        private async Task DeductWalletAsync(int userId, int walletId, decimal amount)
+        private async Task<(bool Ok, string? Error)> DeductWalletAsync(int userId, int walletId, decimal amount)
         {
             var wallet = await _walletRepository.GetByIdForUserAsync(userId, walletId);
             if (wallet == null)
-                throw new InvalidOperationException("Ví không hợp lệ.");
+                return (false, "Ví không hợp lệ.");
+
+            var (ok, error) = PersonalExpenseRules.ValidateWalletBalance(wallet.Balance, amount);
+            if (!ok)
+                return (false, error);
 
             wallet.Balance -= amount;
             await _walletRepository.UpdateAsync(wallet);
+            return (true, null);
         }
 
         private async Task RefundWalletAsync(int userId, int walletId, decimal amount)
@@ -209,12 +306,9 @@ namespace ExpenseManagementAPI.Services.Implement
             await _walletRepository.UpdateAsync(wallet);
         }
 
-        private async Task NotifyBudgetAsync(int userId, Expense expense)
+        private async Task NotifyBudgetAsync(int userId, int budgetDetailId)
         {
-            if (!expense.BudgetDetailId.HasValue)
-                return;
-
-            var detail = await _budgetRepository.GetDetailByIdAsync(expense.BudgetDetailId.Value);
+            var detail = await _budgetRepository.GetDetailByIdAsync(budgetDetailId);
             if (detail?.Budget == null)
                 return;
 

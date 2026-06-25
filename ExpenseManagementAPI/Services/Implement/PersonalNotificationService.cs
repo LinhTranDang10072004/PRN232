@@ -31,8 +31,8 @@ namespace ExpenseManagementAPI.Services.Implement
             if (spent > limit)
             {
                 await NotifyAsync(userId,
-                    $"Vượt budget: {budgetName}",
-                    $"Bạn đã chi {spent:N0} / hạn mức {limit:N0}.");
+                    "Vượt ngân sách",
+                    $"Bạn đã vượt ngân sách {budgetName}. Đã chi {spent:N0} / hạn mức {limit:N0}.");
                 return;
             }
 

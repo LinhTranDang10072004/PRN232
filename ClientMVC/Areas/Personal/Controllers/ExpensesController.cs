@@ -74,7 +74,7 @@ namespace ClientMVC.Areas.Personal.Controllers
                 Amount = expense.Amount,
                 ExpenseDate = expense.ExpenseDate?.Date ?? DateTime.Today,
                 CategoryId = expense.CategoryId ?? 0,
-                WalletId = expense.WalletId
+                WalletId = expense.WalletId ?? 0
             });
         }
 

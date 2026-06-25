@@ -37,6 +37,12 @@ namespace ExpenseManagementAPI.Services.Implement
             if (!WalletTypes.All.Contains(request.Type))
                 return (false, null, "Loại ví không hợp lệ.");
 
+            if (string.IsNullOrWhiteSpace(request.Name))
+                return (false, null, "Tên ví không được rỗng.");
+
+            if (request.InitialBalance < 0)
+                return (false, null, "Số dư không được âm.");
+
             var wallet = new Wallet
             {
                 UserId = userId,

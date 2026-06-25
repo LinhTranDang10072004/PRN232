@@ -45,6 +45,7 @@ namespace ExpenseManagementAPI.Services.Implement
                 Name = request.Name.Trim(),
                 OwnerUserId = userId,
                 CompanyId = null,
+                Type = "Expense",
                 Status = CategoryStatus.Active
             };
 

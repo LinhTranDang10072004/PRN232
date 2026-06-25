@@ -15,12 +15,17 @@ namespace ExpenseManagementAPI.DTOs.Personal
         [Range(0.01, double.MaxValue)]
         public decimal Amount { get; set; }
 
-        public DateTime? ExpenseDate { get; set; }
+        [Required]
+        public DateTime ExpenseDate { get; set; }
 
         [Required]
         public int CategoryId { get; set; }
 
-        public int? WalletId { get; set; }
+        [Required]
+        public int WalletId { get; set; }
+
+        /// <summary>Tùy chọn — nếu null thì tự gắn theo Category + tháng/năm ExpenseDate.</summary>
+        public int? BudgetDetailId { get; set; }
     }
 
     public class ExpenseResponse
