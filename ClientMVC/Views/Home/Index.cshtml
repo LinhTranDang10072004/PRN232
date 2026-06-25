@@ -1,22 +1,119 @@
-@{
-    ViewData["Title"] = "Trang chủ";
-}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý chi tiêu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
 
-<div class="text-center py-5">
-    <h1>Quản lý chi tiêu</h1>
-    @if (User.Identity?.IsAuthenticated == true)
-    {
-        <p class="lead">Xin chào, <strong>@User.Identity.Name</strong></p>
-        @if (User.IsInRole("User"))
-        {
-            <a asp-area="Personal" asp-controller="Dashboard" asp-action="Index" class="btn btn-primary me-2">Vào khu vực cá nhân</a>
-            <a asp-area="Personal" asp-controller="Expenses" asp-action="Calendar" class="btn btn-outline-primary">📅 Lịch chi tiêu</a>
-        }
-    }
-    else
-    {
-        <p class="lead">Hệ thống quản lý chi tiêu cá nhân và doanh nghiệp.</p>
-        <a asp-controller="Auth" asp-action="Login" class="btn btn-primary me-2">Đăng nhập</a>
-        <a asp-controller="Auth" asp-action="Register" class="btn btn-outline-primary">Đăng ký</a>
-    }
-</div>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <span class="navbar-brand-icon">💰</span>
+            FinanceMe
+        </a>
+        <div class="navbar-actions">
+            <!-- Khi chưa đăng nhập -->
+            <a href="login.html" class="btn btn-ghost btn-sm">Đăng nhập</a>
+            <a href="register.html" class="btn btn-primary btn-sm">Đăng ký</a>
+
+            <!-- Khi đã đăng nhập (bỏ comment phần dưới và xóa phần trên) -->
+            <!--
+            <span style="font-size:0.875rem;color:#374151;font-weight:500;">👋 Nguyễn Văn A</span>
+            <a href="login.html" class="btn btn-ghost btn-sm">Đăng xuất</a>
+            -->
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main style="padding: 36px 20px;">
+        <div class="container">
+
+            <!-- Hero Banner (chưa đăng nhập) -->
+            <div class="hero-banner" id="hero-guest">
+                <p class="hero-eyebrow">Quản lý tài chính cá nhân</p>
+                <h1 class="hero-title">Kiểm soát chi tiêu,<br>làm chủ tương lai</h1>
+                <p class="hero-desc">
+                    Theo dõi từng khoản chi, phân tích thói quen tài chính và lên kế hoạch ngân sách thông minh hơn mỗi ngày.
+                </p>
+                <div class="hero-actions">
+                    <a href="register.html" class="btn-hero-primary">🚀 Bắt đầu miễn phí</a>
+                    <a href="login.html" class="btn-hero-outline">Đăng nhập</a>
+                </div>
+            </div>
+
+            <!-- Greeting (đã đăng nhập - bỏ comment và ẩn hero-guest) -->
+            <!--
+            <div style="background:#fff;border-radius:14px;border:1px solid #e5e7eb;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
+              <div>
+                <p style="font-size:0.8125rem;color:#6b7280;margin-bottom:3px;">Chào mừng trở lại 👋</p>
+                <h2 style="font-size:1.25rem;font-weight:700;color:#111827;">Nguyễn Văn A</h2>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <a href="dashboard.html" class="btn btn-primary btn-sm">📊 Khu vực cá nhân</a>
+                <a href="calendar.html" class="btn btn-outline btn-sm">📅 Lịch chi tiêu</a>
+              </div>
+            </div>
+            -->
+            <!-- Feature Cards -->
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-card-icon" style="background:#eff6ff;">📊</div>
+                    <p class="feature-card-name">Phân tích chi tiêu</p>
+                    <p class="feature-card-desc">Biểu đồ trực quan theo danh mục</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card-icon" style="background:#ecfdf5;">📅</div>
+                    <p class="feature-card-name">Lịch chi tiêu</p>
+                    <p class="feature-card-desc">Xem chi tiết theo ngày và tháng</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card-icon" style="background:#fffbeb;">🔔</div>
+                    <p class="feature-card-name">Nhắc nhở thông minh</p>
+                    <p class="feature-card-desc">Cảnh báo khi vượt ngân sách</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card-icon" style="background:#fef2f2;">📁</div>
+                    <p class="feature-card-name">Phân loại tự động</p>
+                    <p class="feature-card-desc">Gắn nhãn nhanh từng khoản chi</p>
+                </div>
+            </div>
+
+            <!-- Quick stats row (ví dụ tĩnh) -->
+            <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+                <div class="stat-card" style="flex-direction:row;align-items:center;">
+                    <div class="stat-card-icon blue">💸</div>
+                    <div style="margin-left:14px">
+                        <p class="stat-card-label">Tháng này</p>
+                        <p class="stat-card-value" style="font-size:1.25rem">3.200.000 ₫</p>
+                        <p class="stat-card-sub">Chi tiêu</p>
+                    </div>
+                </div>
+                <div class="stat-card" style="flex-direction:row;align-items:center;">
+                    <div class="stat-card-icon green">💼</div>
+                    <div style="margin-left:14px">
+                        <p class="stat-card-label">Thu nhập</p>
+                        <p class="stat-card-value" style="font-size:1.25rem">15.000.000 ₫</p>
+                        <p class="stat-card-sub">Tháng này</p>
+                    </div>
+                </div>
+                <div class="stat-card" style="flex-direction:row;align-items:center;">
+                    <div class="stat-card-icon amber">💰</div>
+                    <div style="margin-left:14px">
+                        <p class="stat-card-label">Còn lại</p>
+                        <p class="stat-card-value" style="font-size:1.25rem">11.800.000 ₫</p>
+                        <p class="stat-card-sub">Dự kiến tiết kiệm</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>
