@@ -1,0 +1,25 @@
+@{
+    var username = User.Identity?.Name;
+    var fullName = User.FindFirst("FullName")?.Value;
+    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+    var roleLabel = role switch
+    {
+        "User" => "Cá nhân",
+        "Staff" => "Nhân viên",
+        "Admin" => "Quản trị",
+        _ => role
+    };
+}
+
+<div class="user-info text-white text-end lh-sm">
+    @if (!string.IsNullOrWhiteSpace(fullName))
+    {
+        <div class="fw-semibold">👋 @fullName</div>
+        <small class="opacity-75">@username · @roleLabel</small>
+    }
+    else
+    {
+        <div class="fw-semibold">👋 @username</div>
+        <small class="opacity-75">@roleLabel</small>
+    }
+</div>

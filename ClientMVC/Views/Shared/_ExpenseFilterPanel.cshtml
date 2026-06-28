@@ -1,0 +1,151 @@
+@model ClientMVC.Models.ExpenseFilterModel
+@using ClientMVC.Helpers
+@{
+    var config = ViewBag.FilterConfig as ClientMVC.Models.ExpenseFilterViewConfig
+        ?? new ClientMVC.Models.ExpenseFilterViewConfig();
+    var categories = ViewBag.Categories as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
+    var wallets = ViewBag.Wallets as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
+    var accounts = ViewBag.Accounts as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
+    var resultCount = ViewBag.ResultCount as int? ?? 0;
+    var totalAmount = ViewBag.TotalAmount as decimal? ?? 0m;
+    var periods = new[] {
+        ("today", "Hôm nay"),
+        ("week", "Tuần này"),
+        ("month", "Tháng này"),
+        ("lastmonth", "Tháng trước"),
+        ("year", "Năm nay"),
+        ("all", "Tất cả"),
+        ("custom", "Tùy chọn")
+    };
+}
+
+<div class="card shadow-sm mb-3 expense-filter-panel">
+    <div class="card-body">
+        <form method="get"
+              asp-area="@config.Area"
+              asp-controller="@config.Controller"
+              asp-action="@config.FormAction"
+              class="expense-filter-form">
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-muted mb-2">Thời gian</label>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach (var (value, label) in periods)
+                    {
+                        <button type="button"
+                                onclick="setExpensePeriod('@value')"
+                                class="btn btn-sm @(Model.Period == value ? "btn-primary" : "btn-outline-secondary")">
+                            @label
+                        </button>
+                    }
+                </div>
+            </div>
+
+            @if (Model.Period == "custom")
+            {
+                <div class="row g-2 mb-3">
+                    <div class="col-md-3">
+                        <label asp-for="FromDate" class="form-label"></label>
+                        <input asp-for="FromDate" type="date" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="ToDate" class="form-label"></label>
+                        <input asp-for="ToDate" type="date" class="form-control" />
+                    </div>
+                </div>
+            }
+
+            <input type="hidden" asp-for="Period" id="expensePeriod" />
+
+            <div class="row g-2 align-items-end">
+                @if (categories != null)
+                {
+                    <div class="col-md-3">
+                        <label asp-for="CategoryId" class="form-label"></label>
+                        <select asp-for="CategoryId" asp-items="categories" class="form-select">
+                            <option value="">— Tất cả danh mục —</option>
+                        </select>
+                    </div>
+                }
+
+                @if (config.ShowWallet && wallets != null)
+                {
+                    <div class="col-md-3">
+                        <label asp-for="WalletId" class="form-label"></label>
+                        <select asp-for="WalletId" asp-items="wallets" class="form-select">
+                            <option value="">— Tất cả ví —</option>
+                        </select>
+                    </div>
+                }
+
+                @if (config.ShowAccount && accounts != null)
+                {
+                    <div class="col-md-3">
+                        <label asp-for="AccountId" class="form-label"></label>
+                        <select asp-for="AccountId" asp-items="accounts" class="form-select">
+                            <option value="">— Tất cả tài khoản —</option>
+                        </select>
+                    </div>
+                }
+
+                @if (config.ShowStatus)
+                {
+                    <div class="col-md-3">
+                        <label asp-for="Status" class="form-label"></label>
+                        <select asp-for="Status" class="form-select">
+                            <option value="">— Tất cả trạng thái —</option>
+                            <option value="0">Hoàn thành</option>
+                            <option value="1">Chờ duyệt</option>
+                            <option value="2">Đã duyệt</option>
+                            <option value="3">Từ chối</option>
+                        </select>
+                    </div>
+                }
+
+                <div class="col-md-2">
+                    <label asp-for="MinAmount" class="form-label"></label>
+                    <input asp-for="MinAmount" type="number" min="0" step="1000" class="form-control" placeholder="0" />
+                </div>
+
+                <div class="col-md-2">
+                    <label asp-for="MaxAmount" class="form-label"></label>
+                    <input asp-for="MaxAmount" type="number" min="0" step="1000" class="form-control" placeholder="∞" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Keyword" class="form-label"></label>
+                    <input asp-for="Keyword" class="form-control" placeholder="VD: cà phê, taxi..." />
+                </div>
+
+                @if (config.ShowStaffSearch)
+                {
+                    <div class="col-md-3">
+                        <label asp-for="StaffKeyword" class="form-label"></label>
+                        <input asp-for="StaffKeyword" class="form-control" placeholder="Tên hoặc username NV" />
+                    </div>
+                }
+
+                <div class="col-md-auto d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">🔍 Lọc</button>
+                    <a asp-area="@config.Area"
+                       asp-controller="@config.Controller"
+                       asp-action="@config.FormAction"
+                       class="btn btn-outline-secondary">↺ Xóa lọc</a>
+                </div>
+            </div>
+        </form>
+
+        <div class="mt-3 pt-2 border-top d-flex flex-wrap gap-3 small text-muted">
+            <span>📊 <strong>@resultCount</strong> khoản</span>
+            <span>💰 Tổng: <strong class="text-danger">@totalAmount.ToString("N0") đ</strong></span>
+            <span>📅 @ODataExpenseFilterBuilder.GetPeriodLabel(Model.Period)</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setExpensePeriod(value) {
+        document.getElementById('expensePeriod').value = value;
+        document.querySelector('.expense-filter-form').submit();
+    }
+</script>

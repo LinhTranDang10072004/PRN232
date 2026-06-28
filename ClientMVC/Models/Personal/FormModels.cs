@@ -42,16 +42,17 @@ namespace ClientMVC.Models.Personal
     {
         public int? Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng nhập tên ví")]
+        [StringLength(255, ErrorMessage = "Tên ví tối đa 255 ký tự")]
         [Display(Name = "Tên ví")]
         public string Name { get; set; } = null!;
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn loại ví")]
         [Display(Name = "Loại ví")]
         public string Type { get; set; } = "Cash";
 
         [Display(Name = "Số dư ban đầu")]
-        [Range(0, double.MaxValue)]
+        [Range(0, double.MaxValue, ErrorMessage = "Số dư ban đầu không được âm")]
         public decimal InitialBalance { get; set; }
 
         public string? ErrorMessage { get; set; }
@@ -61,7 +62,8 @@ namespace ClientMVC.Models.Personal
     {
         public int? Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng nhập tên danh mục")]
+        [StringLength(255, ErrorMessage = "Tên danh mục tối đa 255 ký tự")]
         [Display(Name = "Tên danh mục")]
         public string Name { get; set; } = null!;
 
@@ -70,23 +72,25 @@ namespace ClientMVC.Models.Personal
 
     public class BudgetFormModel
     {
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn danh mục")]
+        [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn danh mục")]
         [Display(Name = "Danh mục")]
         public int CategoryId { get; set; }
 
-        [Range(1, 12)]
+        [Range(1, 12, ErrorMessage = "Tháng phải từ 1 đến 12")]
         [Display(Name = "Tháng")]
         public int Month { get; set; } = DateTime.Today.Month;
 
-        [Range(2000, 2100)]
+        [Range(2000, 2100, ErrorMessage = "Năm không hợp lệ")]
         [Display(Name = "Năm")]
         public int Year { get; set; } = DateTime.Today.Year;
 
-        [Required]
-        [Range(0.01, double.MaxValue)]
+        [Required(ErrorMessage = "Vui lòng nhập hạn mức")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Hạn mức phải lớn hơn 0")]
         [Display(Name = "Hạn mức")]
         public decimal LimitAmount { get; set; }
 
+        [StringLength(255, ErrorMessage = "Tên budget tối đa 255 ký tự")]
         [Display(Name = "Tên budget")]
         public string? Name { get; set; }
 
@@ -97,28 +101,31 @@ namespace ClientMVC.Models.Personal
     {
         public int? Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng nhập tiêu đề")]
+        [StringLength(255, ErrorMessage = "Tiêu đề tối đa 255 ký tự")]
         [Display(Name = "Tiêu đề")]
         public string Title { get; set; } = null!;
 
         [Display(Name = "Mô tả")]
         public string? Description { get; set; }
 
-        [Required]
-        [Range(0.01, double.MaxValue)]
+        [Required(ErrorMessage = "Vui lòng nhập số tiền")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Số tiền phải lớn hơn 0")]
         [Display(Name = "Số tiền")]
         public decimal Amount { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn ngày chi")]
         [Display(Name = "Ngày chi")]
         [DataType(DataType.Date)]
         public DateTime ExpenseDate { get; set; } = DateTime.Today;
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn danh mục")]
+        [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn danh mục")]
         [Display(Name = "Danh mục")]
         public int CategoryId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn ví")]
+        [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn ví")]
         [Display(Name = "Ví")]
         public int WalletId { get; set; }
 

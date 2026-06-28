@@ -6,28 +6,31 @@ namespace ClientMVC.Models.Staff
     {
         public int? Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng nhập tiêu đề")]
+        [StringLength(255, ErrorMessage = "Tiêu đề tối đa 255 ký tự")]
         [Display(Name = "Tiêu đề")]
         public string Title { get; set; } = null!;
 
         [Display(Name = "Mô tả")]
         public string? Description { get; set; }
 
-        [Required]
-        [Range(0.01, double.MaxValue)]
+        [Required(ErrorMessage = "Vui lòng nhập số tiền")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Số tiền phải lớn hơn 0")]
         [Display(Name = "Số tiền")]
         public decimal Amount { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn ngày chi")]
         [Display(Name = "Ngày chi")]
         [DataType(DataType.Date)]
         public DateTime ExpenseDate { get; set; } = DateTime.Today;
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn danh mục")]
+        [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn danh mục")]
         [Display(Name = "Danh mục")]
         public int CategoryId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn tài khoản công ty")]
+        [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn tài khoản công ty")]
         [Display(Name = "Tài khoản công ty")]
         public int AccountId { get; set; }
 

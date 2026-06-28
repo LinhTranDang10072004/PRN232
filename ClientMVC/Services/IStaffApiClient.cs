@@ -8,7 +8,7 @@ namespace ClientMVC.Services
         Task<(bool Ok, string? Error)> UpdateProfileAsync(ProfileFormModel model);
         Task<(bool Ok, string? Error)> ChangePasswordAsync(ChangePasswordFormModel model);
         Task<StaffDashboardDto?> GetDashboardAsync();
-        Task<List<StaffExpenseDto>> GetExpensesAsync(string? oDataFilter = null);
+        Task<List<StaffExpenseDto>> GetExpensesAsync(string? oDataFilter = null, string? oDataOrderBy = null);
         Task<StaffExpenseDto?> GetExpenseAsync(int id);
         Task<(bool Ok, StaffExpenseDto? Data, string? Error)> CreateExpenseAsync(StaffExpenseFormModel model);
         Task<(bool Ok, StaffExpenseDto? Data, string? Error)> UpdateExpenseAsync(int id, StaffExpenseFormModel model);

@@ -23,7 +23,7 @@ namespace ClientMVC.Services
         Task<(bool Ok, BudgetDto? Data, string? Error)> CreateBudgetAsync(BudgetFormModel model);
         Task<(bool Ok, BudgetDto? Data, string? Error)> UpdateBudgetLimitAsync(int id, decimal limitAmount);
 
-        Task<List<ExpenseDto>> GetExpensesAsync(string? oDataFilter = null);
+        Task<List<ExpenseDto>> GetExpensesAsync(string? oDataFilter = null, string? oDataOrderBy = null);
         Task<List<ExpenseDto>> GetExpensesForMonthAsync(int year, int month);
         Task<ExpenseDto?> GetExpenseAsync(int id);
         Task<(bool Ok, ExpenseDto? Data, string? Error)> CreateExpenseAsync(ExpenseFormModel model);

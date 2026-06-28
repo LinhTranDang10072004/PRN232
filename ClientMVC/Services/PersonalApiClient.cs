@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using ClientMVC.Helpers;
 using ClientMVC.Models.Personal;
 
 namespace ClientMVC.Services
@@ -111,11 +112,9 @@ namespace ClientMVC.Services
             return await ParseDataAsync<BudgetDto>(response);
         }
 
-        public Task<List<ExpenseDto>> GetExpensesAsync(string? oDataFilter = null)
+        public Task<List<ExpenseDto>> GetExpensesAsync(string? oDataFilter = null, string? oDataOrderBy = null)
         {
-            var url = "api/personal/expenses";
-            if (!string.IsNullOrEmpty(oDataFilter))
-                url += $"?$filter={Uri.EscapeDataString(oDataFilter)}";
+            var url = "api/personal/expenses" + ODataExpenseFilterBuilder.BuildQueryString(oDataFilter, oDataOrderBy ?? "ExpenseDate desc");
             return GetODataListAsync<ExpenseDto>(url);
         }
 

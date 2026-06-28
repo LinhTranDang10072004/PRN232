@@ -15,8 +15,5 @@ namespace ExpenseManagementAPI.DTOs.Auth
         [EmailAddress]
         [StringLength(100)]
         public string? Email { get; set; }
-
-        [StringLength(255)]
-        public string? FullName { get; set; }
     }
 }

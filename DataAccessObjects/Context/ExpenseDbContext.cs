@@ -190,19 +190,6 @@ namespace DataAccessObjects.Context
                     .HasForeignKey(h => h.AccountId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
-
-            SeedPersonalCategories(modelBuilder);
-        }
-
-        private static void SeedPersonalCategories(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Category>().HasData(
-                new Category { Id = 1, Name = "Ăn uống", Status = CategoryStatus.Active, CompanyId = null, OwnerUserId = null },
-                new Category { Id = 2, Name = "Di chuyển", Status = CategoryStatus.Active, CompanyId = null, OwnerUserId = null },
-                new Category { Id = 3, Name = "Mua sắm", Status = CategoryStatus.Active, CompanyId = null, OwnerUserId = null },
-                new Category { Id = 4, Name = "Giải trí", Status = CategoryStatus.Active, CompanyId = null, OwnerUserId = null },
-                new Category { Id = 5, Name = "Khác (cá nhân)", Status = CategoryStatus.Active, CompanyId = null, OwnerUserId = null }
-            );
         }
     }
 }

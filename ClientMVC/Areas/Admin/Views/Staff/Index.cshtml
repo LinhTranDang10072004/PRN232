@@ -37,7 +37,8 @@
                         }
                     </td>
                     <td class="text-end">
-                        <form asp-action="ToggleActive" method="post" class="d-inline">
+                        <form asp-action="ToggleActive" method="post" class="d-inline"
+                              onsubmit="return confirm('@(s.IsActive ? "Khóa tài khoản nhân viên này?" : "Mở khóa tài khoản nhân viên này?")');">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@s.Id" />
                             <input type="hidden" name="isActive" value="@((!s.IsActive).ToString().ToLower())" />

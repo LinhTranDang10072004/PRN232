@@ -5,10 +5,16 @@
 @if (!string.IsNullOrEmpty(Model.ErrorMessage)) { <div class="alert alert-danger">@Model.ErrorMessage</div> }
 <form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="card p-4 shadow-sm" style="max-width:420px">
     @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
     <div class="mb-3">
         <label asp-for="Name" class="form-label"></label>
         <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
-    <button class="btn btn-primary">Lưu</button>
+    <button type="submit" class="btn btn-primary">Lưu</button>
     <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

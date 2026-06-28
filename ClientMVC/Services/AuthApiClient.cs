@@ -30,8 +30,7 @@ namespace ClientMVC.Services
             {
                 username = model.Username,
                 password = model.Password,
-                email = model.Email,
-                fullName = model.FullName
+                email = model.Email
             });
 
             return await ParseAuthResponseAsync(response);

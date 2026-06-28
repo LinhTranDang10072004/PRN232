@@ -7,6 +7,8 @@ namespace Repositories.Interfaces
     {
         Task<User?> GetByIdAsync(int id);
         Task<User?> GetByUserNameAsync(string userName);
+        Task<User?> GetByEmailAsync(string email);
+        Task<User?> GetByLoginAsync(string login);
         Task<bool> UserNameExistsAsync(string userName);
         Task<bool> EmailExistsAsync(string email);
         Task RegisterPersonalUserAsync(User user);

@@ -11,8 +11,8 @@
     <nav class="navbar navbar-dark bg-primary">
         <div class="container-fluid">
             <a class="navbar-brand" asp-area="Personal" asp-controller="Dashboard" asp-action="Index">💰 Expense Personal</a>
-            <div class="d-flex align-items-center gap-2 text-white">
-                <span class="d-none d-md-inline">@User.Identity?.Name</span>
+            <div class="d-flex align-items-center gap-3 text-white">
+                <partial name="_UserInfo" />
                 <a class="btn btn-sm btn-outline-light position-relative" asp-area="Personal" asp-controller="Notifications" asp-action="Index">
                     🔔
                     @{ var unread = ViewBag.UnreadCount as int? ?? 0; }

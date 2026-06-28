@@ -36,7 +36,6 @@ namespace ExpenseManagementAPI.Services.Implement
                 UserName = request.Username.Trim(),
                 Password = _passwordHasher.Hash(request.Password),
                 Email = request.Email?.Trim(),
-                FullName = request.FullName?.Trim(),
                 IsActive = true
             };
 
@@ -46,15 +45,15 @@ namespace ExpenseManagementAPI.Services.Implement
 
         public async Task<(bool Success, AuthResponse? Data, string? Error)> LoginAsync(LoginRequest request)
         {
-            var user = await _userRepository.GetByUserNameAsync(request.Username.Trim());
+            var user = await _userRepository.GetByLoginAsync(request.Username.Trim());
             if (user == null)
-                return (false, null, "Tên đăng nhập hoặc mật khẩu không đúng.");
+                return (false, null, "Tên đăng nhập/email hoặc mật khẩu không đúng.");
 
             if (!user.IsActive)
                 return (false, null, "Tài khoản đã bị khóa.");
 
             if (!_passwordHasher.Verify(request.Password, user.Password))
-                return (false, null, "Tên đăng nhập hoặc mật khẩu không đúng.");
+                return (false, null, "Tên đăng nhập/email hoặc mật khẩu không đúng.");
 
             return (true, BuildAuthResponse(user), null);
         }

@@ -4,6 +4,7 @@ namespace ExpenseManagementAPI.DTOs.Auth
 {
     public class LoginRequest
     {
+        /// <summary>Tên đăng nhập hoặc email.</summary>
         [Required]
         public string Username { get; set; } = null!;
 

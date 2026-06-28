@@ -3,6 +3,9 @@ using DataAccessObjects.Context;
 using ExpenseManagementAPI;
 using ExpenseManagementAPI.Services.Implement;
 using ExpenseManagementAPI.Services.Interface;
+using ExpenseManagementAPI.Validators;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
@@ -81,6 +84,9 @@ builder.Services.AddControllers()
         .OrderBy()
         .Count()
         .SetMaxTop(100));
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {

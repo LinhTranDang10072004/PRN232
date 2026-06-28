@@ -5,7 +5,7 @@ namespace ClientMVC.Services
     public interface IAdminApiClient
     {
         Task<AdminDashboardDto?> GetDashboardAsync();
-        Task<List<AdminExpenseDto>> GetExpensesAsync(string? oDataFilter = null);
+        Task<List<AdminExpenseDto>> GetExpensesAsync(string? oDataFilter = null, string? oDataOrderBy = null);
         Task<AdminExpenseDto?> GetExpenseAsync(int id);
         Task<(bool Ok, string? Error)> ApproveExpenseAsync(int id);
         Task<(bool Ok, string? Error)> RejectExpenseAsync(int id, string comment);

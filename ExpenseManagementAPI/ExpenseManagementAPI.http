@@ -7,10 +7,10 @@ POST {{ExpenseManagementAPI_HostAddress}}/api/auth/register
 Content-Type: application/json
 
 {
-  "username": "user_demo",
-  "password": "User@123",
-  "email": "user_demo@example.com",
-  "fullName": "Nguyễn Văn A"
+  "username": "your_username",
+  "password": "Your@Password123",
+  "email": "you@example.com",
+  "fullName": "Họ và tên"
 }
 
 ### Đăng nhập User
@@ -19,8 +19,8 @@ POST {{ExpenseManagementAPI_HostAddress}}/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "user_demo",
-  "password": "User@123"
+  "username": "your_username",
+  "password": "Your@Password123"
 }
 
 ### Danh mục cá nhân + OData

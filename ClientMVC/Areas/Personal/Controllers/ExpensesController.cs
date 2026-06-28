@@ -1,4 +1,6 @@
+using BusinessObjects.Enums;
 using ClientMVC.Helpers;
+using ClientMVC.Models;
 using ClientMVC.Models.Personal;
 using ClientMVC.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -22,10 +24,13 @@ namespace ClientMVC.Areas.Personal.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(ExpenseFilterModel filter)
         {
-            var expenses = await _api.GetExpensesAsync();
-            return View(expenses.OrderByDescending(e => e.ExpenseDate).ToList());
+            await LoadFilterLookupsAsync();
+            var oDataFilter = ODataExpenseFilterBuilder.Build(filter, ExpenseFilterScope.Personal);
+            var expenses = await _api.GetExpensesAsync(oDataFilter);
+            SetFilterViewBag(filter, ExpenseFilterScope.Personal, expenses);
+            return View(expenses);
         }
 
         public async Task<IActionResult> Create(DateTime? date)
@@ -119,10 +124,34 @@ namespace ClientMVC.Areas.Personal.Controllers
             var wallets = await _api.GetWalletsAsync();
 
             ViewBag.Categories = new SelectList(
-                categories.Where(c => c.Status == BusinessObjects.Enums.CategoryStatus.Active),
+                categories.Where(c => c.Status == CategoryStatus.Active),
                 "Id", "Name");
 
             ViewBag.Wallets = new SelectList(wallets, "Id", "Name");
+        }
+
+        private async Task LoadFilterLookupsAsync()
+        {
+            var categories = await _api.GetCategoriesAsync();
+            var wallets = await _api.GetWalletsAsync();
+
+            ViewBag.Categories = new SelectList(
+                categories.Where(c => c.Status == CategoryStatus.Active),
+                "Id", "Name");
+
+            ViewBag.Wallets = new SelectList(wallets, "Id", "Name");
+        }
+
+        private void SetFilterViewBag(ExpenseFilterModel filter, ExpenseFilterScope scope, List<ExpenseDto> expenses)
+        {
+            ViewBag.Filter = filter;
+            ViewBag.FilterConfig = new ExpenseFilterViewConfig
+            {
+                Area = "Personal",
+                ShowWallet = scope == ExpenseFilterScope.Personal
+            };
+            ViewBag.ResultCount = expenses.Count;
+            ViewBag.TotalAmount = expenses.Sum(e => e.Amount);
         }
     }
 }

@@ -34,12 +34,14 @@
     <div class="card border-warning mb-3">
         <div class="card-body">
             <h5>Duyệt phiếu</h5>
-            <form asp-action="Approve" asp-route-id="@Model.Id" method="post" class="d-inline">
+            <form asp-action="Approve" asp-route-id="@Model.Id" method="post" class="d-inline"
+                  onsubmit="return confirm('Duyệt phiếu chi này?');">
                 @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-success" onclick="return confirm('Duyệt phiếu này?');">✓ Duyệt</button>
+                <button type="submit" class="btn btn-success">✓ Duyệt</button>
             </form>
             <hr />
-            <form asp-action="Reject" asp-route-id="@Model.Id" method="post">
+            <form asp-action="Reject" asp-route-id="@Model.Id" method="post"
+                  onsubmit="return confirm('Từ chối phiếu chi này?');">
                 @Html.AntiForgeryToken()
                 <div class="mb-2">
                     <label class="form-label">Lý do từ chối *</label>

@@ -100,6 +100,9 @@ namespace ClientMVC.Controllers
                 new("access_token", auth.Token)
             };
 
+            if (!string.IsNullOrWhiteSpace(auth.FullName))
+                claims.Add(new Claim("FullName", auth.FullName));
+
             if (auth.CompanyId.HasValue)
                 claims.Add(new Claim("companyId", auth.CompanyId.Value.ToString()));
 

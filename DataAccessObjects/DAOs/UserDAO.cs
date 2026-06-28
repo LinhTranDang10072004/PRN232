@@ -34,6 +34,9 @@ namespace DataAccessObjects.DAOs
         public async Task<User?> GetByUserNameAsync(ExpenseDbContext context, string userName) =>
             await context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
 
+        public async Task<User?> GetByEmailAsync(ExpenseDbContext context, string email) =>
+            await context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
         public async Task<bool> UserNameExistsAsync(ExpenseDbContext context, string userName) =>
             await context.Users.AnyAsync(u => u.UserName == userName);
 

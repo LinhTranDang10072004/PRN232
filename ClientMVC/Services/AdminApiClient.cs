@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using ClientMVC.Helpers;
 using ClientMVC.Models.Admin;
 
 namespace ClientMVC.Services
@@ -13,11 +14,9 @@ namespace ClientMVC.Services
         public Task<AdminDashboardDto?> GetDashboardAsync() =>
             GetAsync<AdminDashboardDto>("api/admin/expenses/dashboard");
 
-        public Task<List<AdminExpenseDto>> GetExpensesAsync(string? oDataFilter = null)
+        public Task<List<AdminExpenseDto>> GetExpensesAsync(string? oDataFilter = null, string? oDataOrderBy = null)
         {
-            var url = "api/admin/expenses";
-            if (!string.IsNullOrEmpty(oDataFilter))
-                url += $"?$filter={Uri.EscapeDataString(oDataFilter)}";
+            var url = "api/admin/expenses" + ODataExpenseFilterBuilder.BuildQueryString(oDataFilter, oDataOrderBy ?? "ExpenseDate desc");
             return GetODataListAsync<AdminExpenseDto>(url);
         }
 

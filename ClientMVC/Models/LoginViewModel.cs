@@ -4,8 +4,8 @@ namespace ClientMVC.Models
 {
     public class LoginViewModel
     {
-        [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập")]
-        [Display(Name = "Tên đăng nhập")]
+        [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập hoặc email")]
+        [Display(Name = "Tên đăng nhập hoặc email")]
         public string Username { get; set; } = null!;
 
         [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]

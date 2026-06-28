@@ -1,6 +1,7 @@
 @model List<StaffExpenseDto>
 @{
     ViewData["Title"] = "Danh sách phiếu chi";
+    var filter = ViewBag.Filter as ClientMVC.Models.ExpenseFilterModel ?? new ClientMVC.Models.ExpenseFilterModel();
     string StatusBadge(ExpenseStatus s) => s switch
     {
         ExpenseStatus.Pending => "warning",
@@ -21,6 +22,8 @@
     <h2>📋 Phiếu chi của tôi</h2>
     <a asp-action="Create" class="btn btn-success">+ Tạo phiếu chi</a>
 </div>
+
+<partial name="_ExpenseFilterPanel" model="filter" />
 
 <div class="card shadow-sm">
     <div class="table-responsive">
@@ -62,5 +65,5 @@
 
 @if (!Model.Any())
 {
-    <p class="text-muted mt-3">Chưa có phiếu chi nào. <a asp-action="Create">Tạo phiếu chi đầu tiên</a></p>
+    <p class="text-muted mt-3">Không có phiếu chi phù hợp bộ lọc. <a asp-action="Create">Tạo phiếu chi đầu tiên</a></p>
 }

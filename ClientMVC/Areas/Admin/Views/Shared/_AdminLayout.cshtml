@@ -11,8 +11,8 @@
     <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">🏢 Expense Corporate — Admin</a>
-            <div class="d-flex align-items-center gap-2 text-white">
-                <span class="d-none d-md-inline">@User.Identity?.Name</span>
+            <div class="d-flex align-items-center gap-3 text-white">
+                <partial name="_UserInfo" />
                 <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
                     @Html.AntiForgeryToken()
                     <button type="submit" class="btn btn-sm btn-outline-light">Đăng xuất</button>

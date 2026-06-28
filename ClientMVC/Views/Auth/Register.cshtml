@@ -1,3 +1,9 @@
+@model RegisterViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Đăng ký";
+}
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -7,85 +13,49 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 </head>
-<body>
+<body class="home-page">
+
+    <partial name="_MarketingNav" />
 
     <div class="auth-page">
         <div class="auth-card" style="max-width:460px;">
 
-            <!-- Header -->
             <div class="auth-header">
-                <a href="index.html" class="auth-brand-icon" style="text-decoration:none;">💰</a>
+                <a asp-controller="Home" asp-action="Index" class="auth-brand-icon" style="text-decoration:none;">💰</a>
                 <h1 class="auth-title">Tạo tài khoản</h1>
                 <p class="auth-subtitle">Bắt đầu quản lý tài chính ngay hôm nay</p>
             </div>
 
-            <!-- Error -->
-            <!--
-            <div class="alert alert-danger">
-              <span class="alert-icon">⚠️</span>
-              Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.
-            </div>
-            -->
-            <!-- Form -->
-            <form action="/Auth/Register" method="post" novalidate>
-                <input type="hidden" name="__RequestVerificationToken" value="" />
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger">
+                    <span class="alert-icon">⚠️</span>
+                    @Model.ErrorMessage
+                </div>
+            }
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label" for="Username">Tên đăng nhập</label>
-                        <input type="text"
-                               id="Username"
-                               name="Username"
-                               class="form-control"
-                               placeholder="username"
-                               autocomplete="username" />
-                        <!-- <span class="form-error">⚠ Bắt buộc nhập.</span> -->
-                    </div>
+            <form asp-action="Register" asp-controller="Auth" method="post" novalidate>
 
-                    <div class="form-group">
-                        <label class="form-label" for="FullName">Họ và tên</label>
-                        <input type="text"
-                               id="FullName"
-                               name="FullName"
-                               class="form-control"
-                               placeholder="Nguyễn Văn A"
-                               autocomplete="name" />
-                    </div>
+                <div class="form-group">
+                    <label class="form-label" asp-for="Username"></label>
+                    <input asp-for="Username" class="form-control" placeholder="username" autocomplete="username" />
+                    <span asp-validation-for="Username" class="form-error"></span>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="Email">Email</label>
-                    <input type="email"
-                           id="Email"
-                           name="Email"
-                           class="form-control"
-                           placeholder="you@example.com"
-                           autocomplete="email" />
-                    <!-- <span class="form-error">⚠ Email không hợp lệ.</span> -->
+                    <label class="form-label" asp-for="Email"></label>
+                    <input asp-for="Email" class="form-control" placeholder="you@example.com" autocomplete="email" />
+                    <span asp-validation-for="Email" class="form-error"></span>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="Password">Mật khẩu</label>
-                    <input type="password"
-                           id="Password"
-                           name="Password"
-                           class="form-control"
-                           placeholder="Tối thiểu 8 ký tự"
-                           autocomplete="new-password" />
+                    <label class="form-label" asp-for="Password"></label>
+                    <input asp-for="Password" class="form-control" placeholder="Tối thiểu 6 ký tự" autocomplete="new-password" />
                     <span class="form-hint">Dùng kết hợp chữ hoa, chữ thường và số.</span>
-                    <!-- <span class="form-error">⚠ Mật khẩu quá ngắn.</span> -->
-                </div>
-
-                <div class="form-check">
-                    <input type="checkbox" id="agree" name="agree" />
-                    <label for="agree">
-                        Tôi đồng ý với
-                        <a href="#">điều khoản sử dụng</a>
-                        và
-                        <a href="#">chính sách bảo mật</a>
-                    </label>
+                    <span asp-validation-for="Password" class="form-error"></span>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-full">
@@ -95,11 +65,13 @@
 
             <p class="auth-footer">
                 Đã có tài khoản?
-                <a href="login.html" style="font-weight:600;">Đăng nhập →</a>
+                <a asp-action="Login" asp-controller="Auth" style="font-weight:600;">Đăng nhập →</a>
             </p>
 
         </div>
     </div>
+
+    <partial name="_ValidationScriptsPartial" />
 
 </body>
 </html>

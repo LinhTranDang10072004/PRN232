@@ -1,4 +1,6 @@
 using BusinessObjects.Enums;
+using ClientMVC.Helpers;
+using ClientMVC.Models;
 using ClientMVC.Models.Staff;
 using ClientMVC.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +14,14 @@ namespace ClientMVC.Areas.Staff.Controllers
 
         public ExpensesController(IStaffApiClient api) => _api = api;
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(ExpenseFilterModel filter)
         {
-            var expenses = await _api.GetExpensesAsync();
+            await LoadFilterLookupsAsync();
+            var oDataFilter = ODataExpenseFilterBuilder.Build(filter, ExpenseFilterScope.Staff);
+            var expenses = await _api.GetExpensesAsync(oDataFilter);
+            SetFilterViewBag(filter, expenses);
             ViewBag.UnreadCount = await _api.GetUnreadCountAsync();
-            return View(expenses.OrderByDescending(e => e.CreatedAt).ToList());
+            return View(expenses);
         }
 
         public async Task<IActionResult> Details(int id)
@@ -129,6 +134,30 @@ namespace ClientMVC.Areas.Staff.Controllers
             ViewBag.Accounts = new SelectList(
                 accounts.Select(a => new { a.Id, Display = $"{a.Name} ({a.AccountNumber})" }),
                 "Id", "Display");
+        }
+
+        private async Task LoadFilterLookupsAsync()
+        {
+            var categories = await _api.GetCategoriesAsync();
+            var accounts = await _api.GetAccountsAsync();
+
+            ViewBag.Categories = new SelectList(categories, "Id", "Name");
+            ViewBag.Accounts = new SelectList(
+                accounts.Select(a => new { a.Id, Display = $"{a.Name} ({a.AccountNumber})" }),
+                "Id", "Display");
+        }
+
+        private void SetFilterViewBag(ExpenseFilterModel filter, List<StaffExpenseDto> expenses)
+        {
+            ViewBag.Filter = filter;
+            ViewBag.FilterConfig = new ExpenseFilterViewConfig
+            {
+                Area = "Staff",
+                ShowAccount = true,
+                ShowStatus = true
+            };
+            ViewBag.ResultCount = expenses.Count;
+            ViewBag.TotalAmount = expenses.Sum(e => e.Amount);
         }
     }
 }

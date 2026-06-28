@@ -11,6 +11,7 @@
     <div class="mb-2">
         <label asp-for="Name" class="form-label">Tên</label>
         <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Status" class="form-label">Trạng thái</label>
@@ -19,3 +20,7 @@
     <button type="submit" class="btn btn-primary">Lưu</button>
     <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

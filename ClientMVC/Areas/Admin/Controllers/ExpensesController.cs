@@ -1,7 +1,10 @@
 using BusinessObjects.Enums;
+using ClientMVC.Helpers;
+using ClientMVC.Models;
 using ClientMVC.Models.Admin;
 using ClientMVC.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ClientMVC.Areas.Admin.Controllers
 {
@@ -11,19 +14,25 @@ namespace ClientMVC.Areas.Admin.Controllers
 
         public ExpensesController(IAdminApiClient api) => _api = api;
 
-        public async Task<IActionResult> Index(string? status)
+        public async Task<IActionResult> Index(ExpenseFilterModel filter, string? status)
         {
-            string? filter = status?.ToLowerInvariant() switch
+            if (!filter.Status.HasValue && !string.IsNullOrEmpty(status))
             {
-                "pending" => "Status eq 1",
-                "approved" => "Status eq 2",
-                "rejected" => "Status eq 3",
-                _ => null
-            };
+                filter.Status = status.ToLowerInvariant() switch
+                {
+                    "pending" => ExpenseStatus.Pending,
+                    "approved" => ExpenseStatus.Approved,
+                    "rejected" => ExpenseStatus.Rejected,
+                    _ => null
+                };
+            }
 
-            var expenses = await _api.GetExpensesAsync(filter);
+            await LoadFilterLookupsAsync();
+            var oDataFilter = ODataExpenseFilterBuilder.Build(filter, ExpenseFilterScope.Admin);
+            var expenses = await _api.GetExpensesAsync(oDataFilter);
+            SetFilterViewBag(filter, expenses);
             ViewBag.Status = status;
-            return View(expenses.OrderByDescending(e => e.CreatedAt).ToList());
+            return View(expenses);
         }
 
         public async Task<IActionResult> Details(int id)
@@ -57,6 +66,25 @@ namespace ClientMVC.Areas.Admin.Controllers
             if (!ok) SetError(error ?? "Từ chối thất bại.");
             else SetSuccess("Đã từ chối phiếu chi.");
             return RedirectToAction(nameof(Details), new { id });
+        }
+
+        private async Task LoadFilterLookupsAsync()
+        {
+            var categories = await _api.GetCategoriesAsync();
+            ViewBag.Categories = new SelectList(categories, "Id", "Name");
+        }
+
+        private void SetFilterViewBag(ExpenseFilterModel filter, List<AdminExpenseDto> expenses)
+        {
+            ViewBag.Filter = filter;
+            ViewBag.FilterConfig = new ExpenseFilterViewConfig
+            {
+                Area = "Admin",
+                ShowStatus = true,
+                ShowStaffSearch = true
+            };
+            ViewBag.ResultCount = expenses.Count;
+            ViewBag.TotalAmount = expenses.Sum(e => e.Amount);
         }
     }
 }

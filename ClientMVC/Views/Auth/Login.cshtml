@@ -1,3 +1,10 @@
+@model LoginViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Đăng nhập";
+    var returnUrl = ViewData["ReturnUrl"] as string;
+}
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -7,56 +14,45 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 </head>
-<body>
+<body class="home-page">
+
+    <partial name="_MarketingNav" />
 
     <div class="auth-page">
         <div class="auth-card">
 
-            <!-- Header -->
             <div class="auth-header">
-                <a href="index.html" class="auth-brand-icon" style="text-decoration:none;">💰</a>
+                <a asp-controller="Home" asp-action="Index" class="auth-brand-icon" style="text-decoration:none;">💰</a>
                 <h1 class="auth-title">Đăng nhập</h1>
-                <p class="auth-subtitle">Chào mừng trở lại!</p>
+                <p class="auth-subtitle">Chào mừng trở lại FinanceMe!</p>
             </div>
 
-            <!-- Error (bỏ comment nếu có lỗi) -->
-            <!--
-            <div class="alert alert-danger">
-              <span class="alert-icon">⚠️</span>
-              Tên đăng nhập hoặc mật khẩu không đúng.
-            </div>
-            -->
-            <!-- Form -->
-            <form action="/Auth/Login" method="post" novalidate>
-                <input type="hidden" name="__RequestVerificationToken" value="" />
-                <input type="hidden" name="returnUrl" value="" />
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger">
+                    <span class="alert-icon">⚠️</span>
+                    @Model.ErrorMessage
+                </div>
+            }
+
+            <form asp-action="Login" asp-controller="Auth" method="post" novalidate>
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
 
                 <div class="form-group">
-                    <label class="form-label" for="Username">Tên đăng nhập</label>
-                    <input type="text"
-                           id="Username"
-                           name="Username"
-                           class="form-control"
-                           placeholder="Nhập tên đăng nhập"
-                           autofocus
-                           autocomplete="username" />
-                    <!-- <span class="form-error">⚠ Vui lòng nhập tên đăng nhập.</span> -->
+                    <label class="form-label" asp-for="Username"></label>
+                    <input asp-for="Username" class="form-control" placeholder="Tên đăng nhập hoặc email" autofocus autocomplete="username" />
+                    <span asp-validation-for="Username" class="form-error"></span>
                 </div>
 
                 <div class="form-group">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                        <label class="form-label" for="Password" style="margin-bottom:0">Mật khẩu</label>
-                        <a href="#" style="font-size:0.8125rem;">Quên mật khẩu?</a>
+                        <label class="form-label" asp-for="Password" style="margin-bottom:0"></label>
                     </div>
-                    <input type="password"
-                           id="Password"
-                           name="Password"
-                           class="form-control"
-                           placeholder="Nhập mật khẩu"
-                           autocomplete="current-password" />
-                    <!-- <span class="form-error">⚠ Vui lòng nhập mật khẩu.</span> -->
+                    <input asp-for="Password" class="form-control" placeholder="Nhập mật khẩu" autocomplete="current-password" />
+                    <span asp-validation-for="Password" class="form-error"></span>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-full" style="margin-top:4px;">
@@ -66,14 +62,13 @@
 
             <p class="auth-footer">
                 Chưa có tài khoản?
-                <a href="register.html" style="font-weight:600;">Đăng ký ngay →</a>
+                <a asp-action="Register" asp-controller="Auth" style="font-weight:600;">Đăng ký ngay →</a>
             </p>
-
-            <!-- Demo credentials -->
-           
 
         </div>
     </div>
+
+    <partial name="_ValidationScriptsPartial" />
 
 </body>
 </html>

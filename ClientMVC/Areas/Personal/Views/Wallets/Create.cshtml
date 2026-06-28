@@ -9,9 +9,11 @@
 
 <form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post" class="card p-4 shadow-sm" style="max-width:480px">
     @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
     <div class="mb-3">
         <label asp-for="Name" class="form-label"></label>
         <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Type" class="form-label"></label>
@@ -21,14 +23,20 @@
             <option value="Momo">Momo</option>
             <option value="Savings">Tiết kiệm</option>
         </select>
+        <span asp-validation-for="Type" class="text-danger"></span>
     </div>
     @if (!isEdit)
     {
         <div class="mb-3">
             <label asp-for="InitialBalance" class="form-label"></label>
             <input asp-for="InitialBalance" class="form-control" />
+            <span asp-validation-for="InitialBalance" class="text-danger"></span>
         </div>
     }
     <button type="submit" class="btn btn-primary">Lưu</button>
     <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

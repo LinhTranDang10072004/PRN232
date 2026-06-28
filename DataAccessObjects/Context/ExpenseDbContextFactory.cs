@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
 namespace DataAccessObjects.Context
 {
@@ -7,9 +8,17 @@ namespace DataAccessObjects.Context
     {
         public ExpenseDbContext CreateDbContext(string[] args)
         {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "..", "ExpenseManagementAPI"))
+                .AddJsonFile("appsettings.json", optional: false)
+                .AddJsonFile("appsettings.Development.json", optional: true)
+                .Build();
+
+            var connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
             var optionsBuilder = new DbContextOptionsBuilder<ExpenseDbContext>();
-            optionsBuilder.UseSqlServer(
-                "Server=127.0.0.1,1433;uid=sa;password=YourStrong!Passw0rd;database=ExpenseManagement;Encrypt=True;TrustServerCertificate=True;");
+            optionsBuilder.UseSqlServer(connectionString);
             return new ExpenseDbContext(optionsBuilder.Options);
         }
     }

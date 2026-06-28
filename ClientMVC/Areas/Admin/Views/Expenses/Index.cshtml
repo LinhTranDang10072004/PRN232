@@ -2,6 +2,7 @@
 @using BusinessObjects.Enums
 @{
     ViewData["Title"] = "Duyệt phiếu chi";
+    var filter = ViewBag.Filter as ClientMVC.Models.ExpenseFilterModel ?? new ClientMVC.Models.ExpenseFilterModel();
     string StatusBadge(ExpenseStatus s) => s switch
     {
         ExpenseStatus.Pending => "warning",
@@ -22,11 +23,13 @@
 <h2>📋 Phiếu chi công ty</h2>
 
 <div class="mb-3">
-    <a asp-action="Index" class="btn btn-sm @(string.IsNullOrEmpty(status) ? "btn-primary" : "btn-outline-primary")">Tất cả</a>
+    <a asp-action="Index" asp-route-status="" class="btn btn-sm @(string.IsNullOrEmpty(status) ? "btn-primary" : "btn-outline-primary")">Tất cả</a>
     <a asp-action="Index" asp-route-status="pending" class="btn btn-sm @(status == "pending" ? "btn-warning" : "btn-outline-warning")">Chờ duyệt</a>
     <a asp-action="Index" asp-route-status="approved" class="btn btn-sm @(status == "approved" ? "btn-success" : "btn-outline-success")">Đã duyệt</a>
     <a asp-action="Index" asp-route-status="rejected" class="btn btn-sm @(status == "rejected" ? "btn-danger" : "btn-outline-danger")">Từ chối</a>
 </div>
+
+<partial name="_ExpenseFilterPanel" model="filter" />
 
 <div class="card shadow-sm">
     <div class="table-responsive">
@@ -64,5 +67,5 @@
 
 @if (!Model.Any())
 {
-    <p class="text-muted mt-3">Không có phiếu chi.</p>
+    <p class="text-muted mt-3">Không có phiếu chi phù hợp bộ lọc.</p>
 }

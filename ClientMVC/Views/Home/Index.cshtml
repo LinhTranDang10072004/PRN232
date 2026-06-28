@@ -1,119 +1,259 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Quản lý chi tiêu";
+    var year = DateTime.Now.Year;
+}
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quản lý chi tiêu</title>
+    <title>Quản lý chi tiêu — FinanceMe</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 </head>
-<body>
+<body class="home-page">
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <a href="index.html" class="navbar-brand">
-            <span class="navbar-brand-icon">💰</span>
-            FinanceMe
-        </a>
-        <div class="navbar-actions">
-            <!-- Khi chưa đăng nhập -->
-            <a href="login.html" class="btn btn-ghost btn-sm">Đăng nhập</a>
-            <a href="register.html" class="btn btn-primary btn-sm">Đăng ký</a>
+    <partial name="_MarketingNav" />
 
-            <!-- Khi đã đăng nhập (bỏ comment phần dưới và xóa phần trên) -->
-            <!--
-            <span style="font-size:0.875rem;color:#374151;font-weight:500;">👋 Nguyễn Văn A</span>
-            <a href="login.html" class="btn btn-ghost btn-sm">Đăng xuất</a>
-            -->
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main style="padding: 36px 20px;">
-        <div class="container">
-
-            <!-- Hero Banner (chưa đăng nhập) -->
-            <div class="hero-banner" id="hero-guest">
-                <p class="hero-eyebrow">Quản lý tài chính cá nhân</p>
-                <h1 class="hero-title">Kiểm soát chi tiêu,<br>làm chủ tương lai</h1>
-                <p class="hero-desc">
-                    Theo dõi từng khoản chi, phân tích thói quen tài chính và lên kế hoạch ngân sách thông minh hơn mỗi ngày.
+    <section>
+        <div class="hero-section">
+            <div>
+                <div class="hero-eyebrow-pill">
+                    <span class="hero-eyebrow-dot"></span>
+                    Quản lý tài chính cá nhân
+                </div>
+                <h1 class="hero-headline">
+                    Kiểm soát chi tiêu,<br>
+                    <span>làm chủ tương lai</span>
+                </h1>
+                <p class="hero-lead">
+                    Ghi lại từng khoản chi trong vài giây, phân tích thói quen tài chính bằng biểu đồ trực quan, và đặt ngân sách thông minh cho từng tháng.
                 </p>
-                <div class="hero-actions">
-                    <a href="register.html" class="btn-hero-primary">🚀 Bắt đầu miễn phí</a>
-                    <a href="login.html" class="btn-hero-outline">Đăng nhập</a>
+                <div class="hero-cta-row">
+                    <a asp-controller="Auth" asp-action="Register" class="btn btn-primary" style="padding: 12px 28px; font-size: 0.9375rem;">
+                        🚀 Bắt đầu miễn phí
+                    </a>
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-outline" style="padding: 12px 24px; font-size: 0.9375rem;">
+                        Đăng nhập
+                    </a>
                 </div>
-            </div>
-
-            <!-- Greeting (đã đăng nhập - bỏ comment và ẩn hero-guest) -->
-            <!--
-            <div style="background:#fff;border-radius:14px;border:1px solid #e5e7eb;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
-              <div>
-                <p style="font-size:0.8125rem;color:#6b7280;margin-bottom:3px;">Chào mừng trở lại 👋</p>
-                <h2 style="font-size:1.25rem;font-weight:700;color:#111827;">Nguyễn Văn A</h2>
-              </div>
-              <div style="display:flex;gap:10px;flex-wrap:wrap">
-                <a href="dashboard.html" class="btn btn-primary btn-sm">📊 Khu vực cá nhân</a>
-                <a href="calendar.html" class="btn btn-outline btn-sm">📅 Lịch chi tiêu</a>
-              </div>
-            </div>
-            -->
-            <!-- Feature Cards -->
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-card-icon" style="background:#eff6ff;">📊</div>
-                    <p class="feature-card-name">Phân tích chi tiêu</p>
-                    <p class="feature-card-desc">Biểu đồ trực quan theo danh mục</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-card-icon" style="background:#ecfdf5;">📅</div>
-                    <p class="feature-card-name">Lịch chi tiêu</p>
-                    <p class="feature-card-desc">Xem chi tiết theo ngày và tháng</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-card-icon" style="background:#fffbeb;">🔔</div>
-                    <p class="feature-card-name">Nhắc nhở thông minh</p>
-                    <p class="feature-card-desc">Cảnh báo khi vượt ngân sách</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-card-icon" style="background:#fef2f2;">📁</div>
-                    <p class="feature-card-name">Phân loại tự động</p>
-                    <p class="feature-card-desc">Gắn nhãn nhanh từng khoản chi</p>
-                </div>
-            </div>
-
-            <!-- Quick stats row (ví dụ tĩnh) -->
-            <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
-                <div class="stat-card" style="flex-direction:row;align-items:center;">
-                    <div class="stat-card-icon blue">💸</div>
-                    <div style="margin-left:14px">
-                        <p class="stat-card-label">Tháng này</p>
-                        <p class="stat-card-value" style="font-size:1.25rem">3.200.000 ₫</p>
-                        <p class="stat-card-sub">Chi tiêu</p>
+                <div class="hero-stats-row">
+                    <div class="hero-stat">
+                        <div class="hero-stat-val">10K+</div>
+                        <div class="hero-stat-label">Người dùng</div>
                     </div>
-                </div>
-                <div class="stat-card" style="flex-direction:row;align-items:center;">
-                    <div class="stat-card-icon green">💼</div>
-                    <div style="margin-left:14px">
-                        <p class="stat-card-label">Thu nhập</p>
-                        <p class="stat-card-value" style="font-size:1.25rem">15.000.000 ₫</p>
-                        <p class="stat-card-sub">Tháng này</p>
+                    <div class="hero-stat-divider"></div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-val">500K+</div>
+                        <div class="hero-stat-label">Khoản chi đã ghi</div>
                     </div>
-                </div>
-                <div class="stat-card" style="flex-direction:row;align-items:center;">
-                    <div class="stat-card-icon amber">💰</div>
-                    <div style="margin-left:14px">
-                        <p class="stat-card-label">Còn lại</p>
-                        <p class="stat-card-value" style="font-size:1.25rem">11.800.000 ₫</p>
-                        <p class="stat-card-sub">Dự kiến tiết kiệm</p>
+                    <div class="hero-stat-divider"></div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-val">98%</div>
+                        <div class="hero-stat-label">Hài lòng</div>
                     </div>
                 </div>
             </div>
 
+            <div class="hero-visual">
+                <div class="preview-badge-float">
+                    <div class="preview-badge-icon">💹</div>
+                    <div>
+                        <div class="preview-badge-label">Tiết kiệm tháng này</div>
+                        <div class="preview-badge-val">+2.400.000 ₫</div>
+                    </div>
+                </div>
+                <div class="preview-badge-float2">
+                    <div style="font-size:1.1rem">📊</div>
+                    <div>
+                        <div class="preview-badge-label">Ngân sách còn lại</div>
+                        <div class="preview-badge-val">68% · 4 ngày nữa</div>
+                    </div>
+                </div>
+
+                <div class="preview-card">
+                    <div class="preview-header">
+                        <span class="preview-header-title">💰 FinanceMe</span>
+                        <span class="preview-header-month">Tháng @DateTime.Now.Month, @year</span>
+                    </div>
+                    <div class="preview-balance-area">
+                        <div class="preview-balance-label">Tổng chi tháng này</div>
+                        <div class="preview-balance-amount">8.250.000 ₫</div>
+                        <div class="preview-balance-sub">↓ Giảm 12% so với tháng trước</div>
+                    </div>
+                    <div class="preview-pills">
+                        <span class="preview-pill green">↑ Thu nhập: 15.000.000 ₫</span>
+                        <span class="preview-pill red">↓ Chi: 8.250.000 ₫</span>
+                    </div>
+                    <div class="preview-body">
+                        <div class="preview-section-title">Gần đây</div>
+                        <div class="preview-expense-row">
+                            <div class="preview-expense-icon" style="background:#fee2e2;">🍜</div>
+                            <div>
+                                <div class="preview-expense-name">Bún bò buổi sáng</div>
+                                <div class="preview-expense-cat">Ăn uống · Hôm nay</div>
+                            </div>
+                            <div class="preview-expense-amt">-45.000 ₫</div>
+                        </div>
+                        <div class="preview-expense-row">
+                            <div class="preview-expense-icon" style="background:#eff6ff;">🚗</div>
+                            <div>
+                                <div class="preview-expense-name">Xăng xe</div>
+                                <div class="preview-expense-cat">Di chuyển · Hôm qua</div>
+                            </div>
+                            <div class="preview-expense-amt">-120.000 ₫</div>
+                        </div>
+                        <div class="preview-expense-row">
+                            <div class="preview-expense-icon" style="background:#ecfdf5;">💼</div>
+                            <div>
+                                <div class="preview-expense-name">Lương tháng @DateTime.Now.Month</div>
+                                <div class="preview-expense-cat">Thu nhập · 01/@DateTime.Now.Month.ToString("00")</div>
+                            </div>
+                            <div class="preview-expense-amt inc">+15.000.000 ₫</div>
+                        </div>
+                        <div class="preview-bar-section">
+                            <div class="preview-bar-label">
+                                <span>🍔 Ăn uống</span><span>3.200.000 / 4.000.000 ₫</span>
+                            </div>
+                            <div class="preview-bar-track">
+                                <div class="preview-bar-fill" style="width:80%;background:#f97316;"></div>
+                            </div>
+                            <div class="preview-bar-label">
+                                <span>🚌 Di chuyển</span><span>680.000 / 1.500.000 ₫</span>
+                            </div>
+                            <div class="preview-bar-track">
+                                <div class="preview-bar-fill" style="width:45%;background:#2563eb;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </main>
+    </section>
+
+    <section style="padding-bottom: 80px;">
+        <div class="section-wrap">
+            <p class="section-eyebrow">Cách hoạt động</p>
+            <h2 class="section-title">Bắt đầu chỉ trong 3 bước</h2>
+            <p class="section-sub">Không cần cấu hình phức tạp. Tạo tài khoản và ghi khoản chi đầu tiên trong chưa đến 2 phút.</p>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Tạo tài khoản</div>
+                    <p class="step-desc">Đăng ký nhanh bằng email. Không cần thẻ tín dụng, hoàn toàn miễn phí để bắt đầu.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Ghi lại chi tiêu</div>
+                    <p class="step-desc">Thêm khoản chi theo ngày, gắn danh mục và ghi chú. Lịch chi tiêu hiển thị tổng quan tức thì.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Phân tích &amp; tiết kiệm</div>
+                    <p class="step-desc">Xem biểu đồ chi tiêu theo danh mục, so sánh theo tháng và điều chỉnh ngân sách thông minh hơn.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="features-inner">
+            <p class="section-eyebrow">Tính năng</p>
+            <h2 class="section-title">Mọi thứ bạn cần để quản lý tài chính</h2>
+            <p class="section-sub">Được thiết kế đặc biệt cho cá nhân muốn hiểu rõ tiền của mình đang đi đâu.</p>
+
+            <div class="features-grid-lg">
+                <div class="feature-lg-card" style="background:#fafbff;">
+                    <div class="feature-lg-icon" style="background:#eff6ff;">📅</div>
+                    <div>
+                        <div class="feature-lg-title">Lịch chi tiêu trực quan</div>
+                        <p class="feature-lg-desc">Xem từng khoản chi theo ngày trên lịch tháng. Nhấn vào ngày bất kỳ để xem chi tiết, thêm hoặc sửa khoản chi nhanh chóng.</p>
+                    </div>
+                </div>
+                <div class="feature-lg-card" style="background:#fafbff;">
+                    <div class="feature-lg-icon" style="background:#ecfdf5;">📊</div>
+                    <div>
+                        <div class="feature-lg-title">Biểu đồ phân tích thông minh</div>
+                        <p class="feature-lg-desc">Biểu đồ tròn và cột theo danh mục giúp bạn thấy ngay mình đang chi nhiều nhất vào đâu và so sánh với tháng trước.</p>
+                    </div>
+                </div>
+                <div class="feature-lg-card" style="background:#fafbff;">
+                    <div class="feature-lg-icon" style="background:#fff7ed;">💰</div>
+                    <div>
+                        <div class="feature-lg-title">Quản lý ngân sách</div>
+                        <p class="feature-lg-desc">Đặt giới hạn chi tiêu cho từng danh mục mỗi tháng. Hệ thống cảnh báo khi bạn sắp vượt ngân sách đã đặt.</p>
+                    </div>
+                </div>
+                <div class="feature-lg-card" style="background:#fafbff;">
+                    <div class="feature-lg-icon" style="background:#fef2f2;">📁</div>
+                    <div>
+                        <div class="feature-lg-title">Phân loại linh hoạt</div>
+                        <p class="feature-lg-desc">Danh mục mặc định đa dạng: ăn uống, đi lại, mua sắm, sức khỏe... Tùy chỉnh thêm theo nhu cầu cá nhân của bạn.</p>
+                    </div>
+                </div>
+                <div class="feature-lg-card" style="background:#fafbff;">
+                    <div class="feature-lg-icon" style="background:#f0fdf4;">🔍</div>
+                    <div>
+                        <div class="feature-lg-title">Tìm kiếm &amp; lọc nhanh</div>
+                        <p class="feature-lg-desc">Tìm khoản chi theo tên, lọc theo danh mục hoặc khoảng thời gian. Không bao giờ mất dấu một khoản nào.</p>
+                    </div>
+                </div>
+                <div class="feature-lg-card" style="background:#fafbff;">
+                    <div class="feature-lg-icon" style="background:#fdf4ff;">📤</div>
+                    <div>
+                        <div class="feature-lg-title">Xuất báo cáo</div>
+                        <p class="feature-lg-desc">Xuất dữ liệu chi tiêu theo tháng dưới dạng file để lưu trữ hoặc chia sẻ với kế toán cá nhân của bạn.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="stats-banner">
+        <div class="stats-banner-inner">
+            <div class="stat-banner-item">
+                <div class="stat-banner-val">10.000+</div>
+                <div class="stat-banner-label">Người dùng đang tin dùng</div>
+            </div>
+            <div class="stat-banner-item">
+                <div class="stat-banner-val">500.000+</div>
+                <div class="stat-banner-label">Khoản chi đã được ghi lại</div>
+            </div>
+            <div class="stat-banner-item">
+                <div class="stat-banner-val">15 giây</div>
+                <div class="stat-banner-label">Thời gian ghi 1 khoản chi</div>
+            </div>
+            <div class="stat-banner-item">
+                <div class="stat-banner-val">Miễn phí</div>
+                <div class="stat-banner-label">Không giới hạn khoản chi</div>
+            </div>
+        </div>
+    </div>
+
+    <section class="cta-section">
+        <div class="cta-inner">
+            <h2 class="cta-title">Sẵn sàng kiểm soát tài chính của bạn?</h2>
+            <p class="cta-desc">Tạo tài khoản miễn phí ngay hôm nay. Không cần thẻ tín dụng.</p>
+            <div class="cta-actions">
+                <a asp-controller="Auth" asp-action="Register" class="btn-hero-primary" style="font-size:0.9375rem;padding:13px 30px;">
+                    🚀 Bắt đầu miễn phí
+                </a>
+                <a asp-controller="Auth" asp-action="Login" class="btn-hero-outline" style="font-size:0.9375rem;padding:13px 26px;">
+                    Đã có tài khoản? Đăng nhập
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="home-footer">
+        © @year FinanceMe · Quản lý tài chính cá nhân đơn giản và hiệu quả
+    </footer>
 
 </body>
 </html>

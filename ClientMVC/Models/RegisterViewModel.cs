@@ -19,9 +19,6 @@ namespace ClientMVC.Models
         [Display(Name = "Email")]
         public string? Email { get; set; }
 
-        [Display(Name = "Họ và tên")]
-        public string? FullName { get; set; }
-
         public string? ErrorMessage { get; set; }
     }
 }

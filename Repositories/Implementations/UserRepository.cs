@@ -22,6 +22,19 @@ namespace Repositories.Implementations
         public Task<User?> GetByUserNameAsync(string userName) =>
             UserDAO.Instance.GetByUserNameAsync(_context, userName);
 
+        public Task<User?> GetByEmailAsync(string email) =>
+            UserDAO.Instance.GetByEmailAsync(_context, email);
+
+        public async Task<User?> GetByLoginAsync(string login)
+        {
+            var trimmed = login.Trim();
+            var byUserName = await GetByUserNameAsync(trimmed);
+            if (byUserName != null)
+                return byUserName;
+
+            return await GetByEmailAsync(trimmed);
+        }
+
         public Task<bool> UserNameExistsAsync(string userName) =>
             UserDAO.Instance.UserNameExistsAsync(_context, userName);
 
