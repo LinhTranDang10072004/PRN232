@@ -1,0 +1,68 @@
+@model List<ClientMVC.Models.Admin.AdminExpenseDto>
+@using BusinessObjects.Enums
+@{
+    ViewData["Title"] = "Duyệt phiếu chi";
+    string StatusBadge(ExpenseStatus s) => s switch
+    {
+        ExpenseStatus.Pending => "warning",
+        ExpenseStatus.Approved => "success",
+        ExpenseStatus.Rejected => "danger",
+        _ => "secondary"
+    };
+    string StatusText(ExpenseStatus s) => s switch
+    {
+        ExpenseStatus.Pending => "Chờ duyệt",
+        ExpenseStatus.Approved => "Đã duyệt",
+        ExpenseStatus.Rejected => "Từ chối",
+        _ => s.ToString()
+    };
+    var status = ViewBag.Status as string;
+}
+
+<h2>📋 Phiếu chi công ty</h2>
+
+<div class="mb-3">
+    <a asp-action="Index" class="btn btn-sm @(string.IsNullOrEmpty(status) ? "btn-primary" : "btn-outline-primary")">Tất cả</a>
+    <a asp-action="Index" asp-route-status="pending" class="btn btn-sm @(status == "pending" ? "btn-warning" : "btn-outline-warning")">Chờ duyệt</a>
+    <a asp-action="Index" asp-route-status="approved" class="btn btn-sm @(status == "approved" ? "btn-success" : "btn-outline-success")">Đã duyệt</a>
+    <a asp-action="Index" asp-route-status="rejected" class="btn btn-sm @(status == "rejected" ? "btn-danger" : "btn-outline-danger")">Từ chối</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Ngày</th>
+                    <th>Nhân viên</th>
+                    <th>Tiêu đề</th>
+                    <th>Danh mục</th>
+                    <th class="text-end">Số tiền</th>
+                    <th>Trạng thái</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model)
+                {
+                    <tr>
+                        <td>@(e.ExpenseDate?.ToString("dd/MM/yyyy") ?? "—")</td>
+                        <td>@(e.StaffFullName ?? e.StaffUserName ?? "—")</td>
+                        <td>@e.Title</td>
+                        <td>@e.CategoryName</td>
+                        <td class="text-end">@e.Amount.ToString("N0") đ</td>
+                        <td><span class="badge bg-@StatusBadge(e.Status)">@StatusText(e.Status)</span></td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@e.Id" class="btn btn-sm btn-outline-secondary">Chi tiết</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <p class="text-muted mt-3">Không có phiếu chi.</p>
+}

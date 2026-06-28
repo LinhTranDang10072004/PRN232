@@ -1,0 +1,47 @@
+@model ClientMVC.Models.Admin.AdminDashboardDto
+@{
+    ViewData["Title"] = "Tổng quan Admin";
+}
+
+<h2>📊 Tổng quan công ty</h2>
+
+<div class="row g-3 mt-2">
+    <div class="col-md-3">
+        <div class="card border-warning">
+            <div class="card-body text-center">
+                <h3 class="text-warning">@Model.PendingCount</h3>
+                <div class="text-muted">Phiếu chờ duyệt</div>
+                <div class="small">@Model.TotalPendingAmount.ToString("N0") đ</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <h3 class="text-success">@Model.ApprovedCount</h3>
+                <div class="text-muted">Đã duyệt</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-danger">
+            <div class="card-body text-center">
+                <h3 class="text-danger">@Model.RejectedCount</h3>
+                <div class="text-muted">Từ chối</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <h3 class="text-primary">@Model.StaffCount</h3>
+                <div class="text-muted">Nhân viên</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-action="Index" asp-controller="Expenses" asp-route-status="pending" class="btn btn-warning">Xem phiếu chờ duyệt</a>
+    <a asp-action="Index" asp-controller="Staff" class="btn btn-outline-primary ms-2">Quản lý nhân viên</a>
+</div>

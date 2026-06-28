@@ -20,11 +20,17 @@ namespace Repositories.Implementations
         public IQueryable<Category> GetForCorporateCompany(int companyId) =>
             CategoryDAO.Instance.ForCorporateCompany(_context, companyId);
 
+        public IQueryable<Category> GetForCorporateCompanyManage(int companyId) =>
+            CategoryDAO.Instance.ForCorporateCompanyManage(_context, companyId);
+
         public Task<Category?> GetByIdAsync(int id) =>
             CategoryDAO.Instance.GetByIdAsync(_context, id);
 
         public Task<bool> NameExistsForPersonalUserAsync(int userId, string name, int? excludeId = null) =>
             CategoryDAO.Instance.NameExistsForPersonalUserAsync(_context, userId, name, excludeId);
+
+        public Task<bool> NameExistsForCompanyAsync(int companyId, string name, int? excludeId = null) =>
+            CategoryDAO.Instance.NameExistsForCompanyAsync(_context, companyId, name, excludeId);
 
         public Task<bool> IsUsedByExpensesAsync(int categoryId) =>
             CategoryDAO.Instance.IsUsedByExpensesAsync(_context, categoryId);
