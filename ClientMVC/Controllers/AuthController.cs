@@ -45,6 +45,8 @@ namespace ClientMVC.Controllers
                 return RedirectToAction("Index", "Dashboard", new { area = "Personal" });
             if (data.Role == "Staff")
                 return RedirectToAction("Index", "Dashboard", new { area = "Staff" });
+            if (data.Role == "Admin")
+                return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
             return RedirectToLocal(returnUrl);
         }
 

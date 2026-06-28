@@ -1,0 +1,21 @@
+@model ClientMVC.Models.Admin.AdminCategoryFormModel
+@using BusinessObjects.Enums
+@{
+    ViewData["Title"] = "Thêm danh mục";
+}
+
+<h2>Thêm danh mục</h2>
+<form asp-action="Create" method="post" class="card p-3 mt-3" style="max-width:400px">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-2">
+        <label asp-for="Name" class="form-label">Tên</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Status" class="form-label">Trạng thái</label>
+        <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<CategoryStatus>()"></select>
+    </div>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+</form>

@@ -10,6 +10,10 @@ namespace ClientMVC.Controllers
         {
             if (User.IsInRole("User"))
                 return RedirectToAction("Index", "Dashboard", new { area = "Personal" });
+            if (User.IsInRole("Staff"))
+                return RedirectToAction("Index", "Dashboard", new { area = "Staff" });
+            if (User.IsInRole("Admin"))
+                return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
             return View();
         }
     }

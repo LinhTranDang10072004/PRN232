@@ -1,0 +1,77 @@
+@model ClientMVC.Models.Admin.AdminExpenseDto
+@using BusinessObjects.Enums
+@{
+    ViewData["Title"] = "Chi tiết phiếu chi";
+}
+
+<h2>Chi tiết phiếu chi #@Model.Id</h2>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Nhân viên</dt>
+            <dd class="col-sm-9">@(Model.StaffFullName ?? Model.StaffUserName)</dd>
+            <dt class="col-sm-3">Tiêu đề</dt>
+            <dd class="col-sm-9">@Model.Title</dd>
+            <dt class="col-sm-3">Mô tả</dt>
+            <dd class="col-sm-9">@(Model.Description ?? "—")</dd>
+            <dt class="col-sm-3">Số tiền</dt>
+            <dd class="col-sm-9"><strong>@Model.Amount.ToString("N0") đ</strong></dd>
+            <dt class="col-sm-3">Ngày chi</dt>
+            <dd class="col-sm-9">@(Model.ExpenseDate?.ToString("dd/MM/yyyy") ?? "—")</dd>
+            <dt class="col-sm-3">Danh mục</dt>
+            <dd class="col-sm-9">@Model.CategoryName</dd>
+            <dt class="col-sm-3">Tài khoản</dt>
+            <dd class="col-sm-9">@(Model.AccountName ?? Model.AccountNumber ?? "—")</dd>
+            <dt class="col-sm-3">Trạng thái</dt>
+            <dd class="col-sm-9">@Model.Status</dd>
+        </dl>
+    </div>
+</div>
+
+@if (Model.Status == ExpenseStatus.Pending)
+{
+    <div class="card border-warning mb-3">
+        <div class="card-body">
+            <h5>Duyệt phiếu</h5>
+            <form asp-action="Approve" asp-route-id="@Model.Id" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-success" onclick="return confirm('Duyệt phiếu này?');">✓ Duyệt</button>
+            </form>
+            <hr />
+            <form asp-action="Reject" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <div class="mb-2">
+                    <label class="form-label">Lý do từ chối *</label>
+                    <textarea name="Comment" class="form-control" rows="2" required maxlength="500"></textarea>
+                </div>
+                <button type="submit" class="btn btn-danger">✗ Từ chối</button>
+            </form>
+        </div>
+    </div>
+}
+
+@if (Model.ApprovalHistories?.Any() == true)
+{
+    <div class="card shadow-sm">
+        <div class="card-header">Lịch sử duyệt</div>
+        <ul class="list-group list-group-flush">
+            @foreach (var h in Model.ApprovalHistories)
+            {
+                <li class="list-group-item">
+                    <strong>@h.Action</strong> — @h.ActionDate.ToString("dd/MM/yyyy HH:mm")
+                    @if (!string.IsNullOrEmpty(h.AdminName))
+                    {
+                        <span class="text-muted">(@h.AdminName)</span>
+                    }
+                    @if (!string.IsNullOrEmpty(h.Comment))
+                    {
+                        <div class="small text-muted">@h.Comment</div>
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+<p class="mt-3"><a asp-action="Index" class="btn btn-outline-secondary">← Quay lại</a></p>

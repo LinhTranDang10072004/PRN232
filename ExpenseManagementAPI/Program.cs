@@ -35,6 +35,10 @@ builder.Services.AddScoped<IStaffExpenseService, StaffExpenseService>();
 builder.Services.AddScoped<IStaffCategoryService, StaffCategoryService>();
 builder.Services.AddScoped<IStaffAccountService, StaffAccountService>();
 builder.Services.AddScoped<IStaffNotificationQueryService, StaffNotificationQueryService>();
+builder.Services.AddScoped<IAdminExpenseService, AdminExpenseService>();
+builder.Services.AddScoped<IAdminStaffService, AdminStaffService>();
+builder.Services.AddScoped<IAdminCategoryService, AdminCategoryService>();
+builder.Services.AddScoped<IAdminAccountService, AdminAccountService>();
 builder.Services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
