@@ -1,0 +1,24 @@
+@model ClientMVC.Models.Admin.AdminAccountFormModel
+@{
+    ViewData["Title"] = "Thêm tài khoản";
+}
+
+<h2>Thêm tài khoản</h2>
+<form asp-action="Create" method="post" class="card p-3 mt-3" style="max-width:400px">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-2">
+        <label asp-for="Name" class="form-label">Tên hiển thị</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label asp-for="AccountNumber" class="form-label">Số tài khoản *</label>
+        <input asp-for="AccountNumber" class="form-control" />
+    </div>
+    <div class="mb-3 form-check">
+        <input asp-for="IsActive" class="form-check-input" />
+        <label asp-for="IsActive" class="form-check-label">Đang hoạt động</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+</form>

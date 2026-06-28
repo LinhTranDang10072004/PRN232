@@ -35,6 +35,11 @@ builder.Services.AddHttpClient<IStaffApiClient, StaffApiClient>(client =>
     client.BaseAddress = new Uri(apiBaseUrl);
 }).AddHttpMessageHandler<JwtBearerHandler>();
 
+builder.Services.AddHttpClient<IAdminApiClient, AdminApiClient>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+}).AddHttpMessageHandler<JwtBearerHandler>();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

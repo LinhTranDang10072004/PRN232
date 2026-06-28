@@ -51,6 +51,20 @@ namespace DataAccessObjects.DAOs
                 .Include(e => e.Wallet)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
+        public async Task<Expense?> GetByIdForAdminAsync(ExpenseDbContext context, int companyId, int expenseId) =>
+            await context.Expenses
+                .Include(e => e.Category)
+                .Include(e => e.Account)
+                .Include(e => e.User)
+                .Include(e => e.ApprovalHistories)
+                    .ThenInclude(h => h.Admin)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e =>
+                    e.Id == expenseId &&
+                    e.User != null &&
+                    e.User.Role == UserRole.CompanyStaff &&
+                    e.User.CompanyId == companyId);
+
         public async Task AddAsync(ExpenseDbContext context, Expense expense)
         {
             await context.Expenses.AddAsync(expense);
