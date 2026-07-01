@@ -20,9 +20,11 @@
     var status = ViewBag.Status as string;
 }
 
-<h2>📋 Phiếu chi công ty</h2>
+<div class="page-header">
+    <h2 class="page-title">📋 Phiếu chi công ty</h2>
+</div>
 
-<div class="mb-3">
+<div class="status-tabs">
     <a asp-action="Index" asp-route-status="" class="btn btn-sm @(string.IsNullOrEmpty(status) ? "btn-primary" : "btn-outline-primary")">Tất cả</a>
     <a asp-action="Index" asp-route-status="pending" class="btn btn-sm @(status == "pending" ? "btn-warning" : "btn-outline-warning")">Chờ duyệt</a>
     <a asp-action="Index" asp-route-status="approved" class="btn btn-sm @(status == "approved" ? "btn-success" : "btn-outline-success")">Đã duyệt</a>
@@ -31,7 +33,7 @@
 
 <partial name="_ExpenseFilterPanel" model="filter" />
 
-<div class="card shadow-sm">
+<div class="card shadow-sm data-table-card">
     <div class="table-responsive">
         <table class="table table-hover mb-0">
             <thead>

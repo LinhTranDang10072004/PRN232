@@ -21,7 +21,7 @@ namespace ClientMVC.Areas.Personal.Controllers
             return View(new DashboardViewModel
             {
                 Summary = summary,
-                Budgets = budgets.Take(5).ToList(),
+                Budgets = budgets,
                 TopCategories = categories.Take(5).ToList(),
                 UnreadNotifications = unread
             });

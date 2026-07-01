@@ -1,9 +1,11 @@
 @model BudgetFormModel
 @{ ViewData["Title"] = "Sửa hạn mức"; }
 
-<h2>Sửa hạn mức — @ViewBag.BudgetName</h2>
+<div class="page-header">
+    <h2 class="page-title">Sửa hạn mức — @ViewBag.BudgetName</h2>
+</div>
 @if (!string.IsNullOrEmpty(Model.ErrorMessage)) { <div class="alert alert-danger">@Model.ErrorMessage</div> }
-<form asp-action="EditLimit" asp-route-id="@Context.Request.RouteValues["id"]" method="post" class="card p-4 shadow-sm" style="max-width:400px">
+<form asp-action="EditLimit" asp-route-id="@Context.Request.RouteValues["id"]" method="post" class="card p-4 shadow-sm personal-form-card personal-form-xs">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="Month" />
     <input type="hidden" asp-for="Year" />

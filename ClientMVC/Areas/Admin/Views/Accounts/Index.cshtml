@@ -3,26 +3,41 @@
     ViewData["Title"] = "Tài khoản công ty";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>🏦 Tài khoản công ty</h2>
-    <a asp-action="Create" class="btn btn-primary">+ Thêm</a>
+<div class="page-header">
+    <h2 class="page-title">🏦 Tài khoản công ty</h2>
+    <div class="page-actions">
+        <a asp-action="Create" class="btn btn-primary">+ Thêm</a>
+    </div>
 </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr><th>Tên</th><th>Số tài khoản</th><th>Trạng thái</th><th></th></tr>
-    </thead>
-    <tbody>
-        @foreach (var a in Model)
-        {
-            <tr>
-                <td>@(a.Name ?? "—")</td>
-                <td>@a.AccountNumber</td>
-                <td>@(a.IsActive ? "Hoạt động" : "Ngưng")</td>
-                <td class="text-end">
-                    <a asp-action="Edit" asp-route-id="@a.Id" class="btn btn-sm btn-outline-primary">Sửa</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="card shadow-sm data-table-card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr><th>Tên</th><th>Số tài khoản</th><th>Trạng thái</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var a in Model)
+                {
+                    <tr>
+                        <td>@(a.Name ?? "—")</td>
+                        <td>@a.AccountNumber</td>
+                        <td>
+                            <span class="badge @(a.IsActive ? "bg-success" : "bg-secondary")">
+                                @(a.IsActive ? "Hoạt động" : "Ngưng")
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@a.Id" class="btn btn-sm btn-outline-primary">Sửa</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <p class="empty-state">Chưa có tài khoản. <a asp-action="Create">Thêm tài khoản đầu tiên</a></p>
+}

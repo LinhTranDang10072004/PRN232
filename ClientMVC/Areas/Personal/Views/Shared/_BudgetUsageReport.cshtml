@@ -1,0 +1,97 @@
+@using ClientMVC.Helpers
+@using ClientMVC.Models.Personal
+@model List<BudgetStatusDto>
+@{
+    var month = (int)(ViewBag.Month ?? DateTime.Today.Month);
+    var year = (int)(ViewBag.Year ?? DateTime.Today.Year);
+    var showTitle = ViewBag.ShowBudgetUsageTitle as bool? ?? true;
+
+    var totalLimit = Model.Sum(b => BudgetDisplayHelper.EffectiveLimit(b.LimitAmount, b.CarryOverDebt));
+    var totalSpent = Model.Sum(b => b.SpentAmount);
+    var overallPct = totalLimit > 0 ? (int)Math.Min(100, Math.Round(totalSpent / totalLimit * 100)) : 0;
+    var exceededCount = Model.Count(b => b.IsExceeded);
+}
+
+@if (showTitle)
+{
+    <div class="budget-usage-header">
+        <div>
+            <h5 class="mb-1">Sử dụng ngân sách tháng @month/@year</h5>
+            <p class="text-muted small mb-0">Theo dõi % đã dùng của từng budget</p>
+        </div>
+        @if (Model.Any())
+        {
+            <div class="budget-usage-overall">
+                <div class="budget-usage-overall-ring @(overallPct >= 100 || exceededCount > 0 ? "is-danger" : overallPct >= 80 ? "is-warning" : "is-ok")">
+                    <span class="budget-usage-overall-value">@overallPct%</span>
+                </div>
+                <div class="budget-usage-overall-meta">
+                    <span class="small text-muted">Tổng đã dùng</span>
+                    <strong>@totalSpent.ToString("N0") / @totalLimit.ToString("N0") đ</strong>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <p class="empty-state mb-0">Chưa có budget tháng này.</p>
+}
+else
+{
+    <div class="budget-usage-legend small text-muted mb-3">
+        <span><i class="budget-usage-dot is-ok"></i> Dưới 80%</span>
+        <span><i class="budget-usage-dot is-warning"></i> 80–99%</span>
+        <span><i class="budget-usage-dot is-danger"></i> Vượt ngân sách</span>
+    </div>
+
+    <div class="budget-usage-list">
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            var b = Model[i];
+            var effective = BudgetDisplayHelper.EffectiveLimit(b.LimitAmount, b.CarryOverDebt);
+            var usagePct = BudgetDisplayHelper.UsagePercent(b.LimitAmount, b.CarryOverDebt, b.SpentAmount);
+            var barWidth = BudgetDisplayHelper.BarWidthPercent(b.LimitAmount, b.CarryOverDebt, b.SpentAmount);
+            var color = BudgetDisplayHelper.GetColor(i);
+            var status = b.IsExceeded ? "is-danger" : usagePct >= 80 ? "is-warning" : "is-ok";
+
+            <div class="budget-usage-item @status">
+                <div class="budget-usage-item-head">
+                    <div class="budget-usage-item-title">
+                        <span class="budget-usage-swatch" style="background:@color"></span>
+                        <div>
+                            <strong>@b.BudgetName</strong>
+                            @if (!string.IsNullOrEmpty(b.CategoryName))
+                            {
+                                <span class="text-muted small d-block">@b.CategoryName</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="budget-usage-item-pct">
+                        <span class="budget-usage-pct-value">@usagePct%</span>
+                        <span class="budget-usage-status small">@BudgetDisplayHelper.StatusLabel(b.IsExceeded, usagePct)</span>
+                    </div>
+                </div>
+
+                <div class="personal-progress budget-usage-bar mb-2">
+                    <div class="progress-bar"
+                         style="width:@barWidth%; background:@(b.IsExceeded ? "#EF4444" : color)"></div>
+                </div>
+
+                <div class="budget-usage-item-foot small">
+                    <span>Đã chi: <strong>@b.SpentAmount.ToString("N0")</strong></span>
+                    <span>Hạn mức: @effective.ToString("N0") đ</span>
+                    @if (b.CarryOverDebt > 0)
+                    {
+                        <span class="text-warning">Nợ tháng trước: @b.CarryOverDebt.ToString("N0")</span>
+                    }
+                    @if (!b.IsExceeded && b.RemainingAmount > 0)
+                    {
+                        <span class="text-success">Còn @b.RemainingAmount.ToString("N0")</span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

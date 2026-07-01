@@ -5,9 +5,9 @@
     var year = (int)ViewBag.Year;
 }
 
-<div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
-    <h2>🎯 Budget tháng @month/@year</h2>
-    <div class="d-flex gap-2">
+<div class="page-header">
+    <h2 class="page-title">🎯 Budget tháng @month/@year</h2>
+    <div class="page-actions">
         <a asp-action="Index" asp-route-month="@(month==1?12:month-1)" asp-route-year="@(month==1?year-1:year)" class="btn btn-outline-secondary btn-sm">‹</a>
         <a asp-action="Index" asp-route-month="@DateTime.Today.Month" asp-route-year="@DateTime.Today.Year" class="btn btn-outline-primary btn-sm">Hôm nay</a>
         <a asp-action="Index" asp-route-month="@(month==12?1:month+1)" asp-route-year="@(month==12?year+1:year)" class="btn btn-outline-secondary btn-sm">›</a>
@@ -21,7 +21,7 @@
     var effectiveLimit = b.LimitAmount - b.CarryOverDebt;
     var pct = effectiveLimit > 0 ? Math.Min(100, (int)(b.SpentAmount / effectiveLimit * 100)) : (b.SpentAmount > 0 ? 100 : 0);
     <div class="col-md-6">
-        <div class="card shadow-sm">
+        <div class="card shadow-sm budget-card h-100">
             <div class="card-body">
                 <h5>@b.Name</h5>
                 <p class="text-muted small mb-2">@b.CategoryName</p>
@@ -29,7 +29,7 @@
                 {
                     <p class="small text-warning mb-2">Nợ chuyển từ tháng trước: @b.CarryOverDebt.ToString("N0")</p>
                 }
-                <div class="progress mb-2" style="height:8px">
+                <div class="progress personal-progress mb-2">
                     <div class="progress-bar @(b.IsExceeded ? "bg-danger" : "bg-success")" style="width:@pct%"></div>
                 </div>
                 <div class="d-flex justify-content-between small">

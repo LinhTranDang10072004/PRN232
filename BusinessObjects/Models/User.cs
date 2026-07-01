@@ -43,5 +43,6 @@ namespace BusinessObjects.Models
         public ICollection<Budget> Budgets { get; set; } = new List<Budget>();
         public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
         public ICollection<ApprovalHistory> ApprovalActions { get; set; } = new List<ApprovalHistory>();
+        public ICollection<MonthClosing> MonthClosings { get; set; } = new List<MonthClosing>();
     }
 }

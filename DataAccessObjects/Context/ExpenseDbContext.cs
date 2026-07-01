@@ -20,6 +20,7 @@ namespace DataAccessObjects.Context
         public DbSet<BudgetDetail> BudgetDetails => Set<BudgetDetail>();
         public DbSet<Expense> Expenses => Set<Expense>();
         public DbSet<ApprovalHistory> ApprovalHistories => Set<ApprovalHistory>();
+        public DbSet<MonthClosing> MonthClosings => Set<MonthClosing>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -197,6 +198,22 @@ namespace DataAccessObjects.Context
                     .WithMany(a => a.ApprovalHistories)
                     .HasForeignKey(h => h.AccountId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<MonthClosing>(entity =>
+            {
+                entity.Property(m => m.TotalSpent).HasColumnType("decimal(18,2)");
+                entity.Property(m => m.TotalBudgetLimit).HasColumnType("decimal(18,2)");
+                entity.Property(m => m.TotalSurplus).HasColumnType("decimal(18,2)");
+                entity.Property(m => m.Status).HasMaxLength(50);
+                entity.Property(m => m.Notes).HasMaxLength(500);
+
+                entity.HasIndex(m => new { m.UserId, m.Month, m.Year }).IsUnique();
+
+                entity.HasOne(m => m.User)
+                    .WithMany(u => u.MonthClosings)
+                    .HasForeignKey(m => m.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

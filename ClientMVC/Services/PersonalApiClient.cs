@@ -176,6 +176,21 @@ namespace ClientMVC.Services
             await _http.PutAsync("api/personal/notifications/read-all", null);
         }
 
+        public Task<MonthClosingPreviewDto?> GetMonthClosingPreviewAsync(int month, int year) =>
+            GetAsync<MonthClosingPreviewDto>($"api/personal/month-closing/preview?month={month}&year={year}");
+
+        public async Task<(bool Ok, MonthClosingResultDto? Data, string? Error)> CloseMonthAsync(
+            int month, int year, string? notes = null)
+        {
+            var response = await _http.PostAsJsonAsync("api/personal/month-closing/close", new
+            {
+                month,
+                year,
+                notes
+            }, ApiJsonOptions.Default);
+            return await ParseDataAsync<MonthClosingResultDto>(response);
+        }
+
         private static object MapExpense(ExpenseFormModel model) => new
         {
             title = model.Title,

@@ -3,45 +3,50 @@
     ViewData["Title"] = "Tổng quan Admin";
 }
 
-<h2>📊 Tổng quan công ty</h2>
+<div class="page-header">
+    <div>
+        <h2 class="page-title">📊 Tổng quan công ty</h2>
+        <p class="page-subtitle">Theo dõi phiếu chi và nhân viên</p>
+    </div>
+</div>
 
-<div class="row g-3 mt-2">
+<div class="row g-3 stats-row">
     <div class="col-md-3">
-        <div class="card border-warning">
+        <div class="card stat-card shadow-sm stat-card-accent-warning">
             <div class="card-body text-center">
-                <h3 class="text-warning">@Model.PendingCount</h3>
-                <div class="text-muted">Phiếu chờ duyệt</div>
-                <div class="small">@Model.TotalPendingAmount.ToString("N0") đ</div>
+                <div class="text-muted small">Phiếu chờ duyệt</div>
+                <div class="fs-3 fw-bold text-warning">@Model.PendingCount</div>
+                <div class="small text-muted">@Model.TotalPendingAmount.ToString("N0") đ</div>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card border-success">
+        <div class="card stat-card shadow-sm stat-card-accent-success">
             <div class="card-body text-center">
-                <h3 class="text-success">@Model.ApprovedCount</h3>
-                <div class="text-muted">Đã duyệt</div>
+                <div class="text-muted small">Đã duyệt</div>
+                <div class="fs-3 fw-bold text-success">@Model.ApprovedCount</div>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card border-danger">
+        <div class="card stat-card shadow-sm stat-card-accent-danger">
             <div class="card-body text-center">
-                <h3 class="text-danger">@Model.RejectedCount</h3>
-                <div class="text-muted">Từ chối</div>
+                <div class="text-muted small">Từ chối</div>
+                <div class="fs-3 fw-bold text-danger">@Model.RejectedCount</div>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card border-primary">
+        <div class="card stat-card shadow-sm stat-card-accent-primary">
             <div class="card-body text-center">
-                <h3 class="text-primary">@Model.StaffCount</h3>
-                <div class="text-muted">Nhân viên</div>
+                <div class="text-muted small">Nhân viên</div>
+                <div class="fs-3 fw-bold text-primary">@Model.StaffCount</div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="mt-4">
+<div class="quick-actions">
     <a asp-action="Index" asp-controller="Expenses" asp-route-status="pending" class="btn btn-warning">Xem phiếu chờ duyệt</a>
-    <a asp-action="Index" asp-controller="Staff" class="btn btn-outline-primary ms-2">Quản lý nhân viên</a>
+    <a asp-action="Index" asp-controller="Staff" class="btn btn-outline-primary">Quản lý nhân viên</a>
 </div>

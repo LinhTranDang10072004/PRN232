@@ -3,14 +3,16 @@
     ViewData["Title"] = Model.Id.HasValue ? "Sửa chi tiêu" : "Thêm chi tiêu";
 }
 
-<h2 class="mb-3">@ViewData["Title"]</h2>
+<div class="page-header">
+    <h2 class="page-title">@ViewData["Title"]</h2>
+</div>
 
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
     <div class="alert alert-danger">@Model.ErrorMessage</div>
 }
 
-<form asp-action="@(Model.Id.HasValue ? "Edit" : "Create")" method="post" class="card shadow-sm p-4" style="max-width:600px">
+<form asp-action="@(Model.Id.HasValue ? "Edit" : "Create")" method="post" class="card shadow-sm p-4 personal-form-card personal-form-md">
     @Html.AntiForgeryToken()
     @if (Model.Id.HasValue)
     {

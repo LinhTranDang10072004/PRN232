@@ -13,5 +13,6 @@ namespace Repositories.Interfaces
         Task UpdateAsync(Budget budget);
         Task<BudgetDetail?> GetDetailByIdAsync(int detailId);
         Task UpdateDetailAsync(BudgetDetail detail);
+        Task<List<Budget>> GetForMonthTrackedAsync(int userId, int month, int year);
     }
 }

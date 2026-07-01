@@ -3,12 +3,14 @@
     ViewData["Title"] = "Danh mục";
 }
 
-<div class="d-flex justify-content-between mb-3">
-    <h2>🏷️ Danh mục chi tiêu</h2>
-    <a asp-action="Create" class="btn btn-primary">+ Thêm</a>
+<div class="page-header">
+    <h2 class="page-title">🏷️ Danh mục chi tiêu</h2>
+    <div class="page-actions">
+        <a asp-action="Create" class="btn btn-primary">+ Thêm</a>
+    </div>
 </div>
 
-<div class="card shadow-sm">
+<div class="card shadow-sm data-table-card">
     <table class="table mb-0">
         <thead><tr><th>Tên</th><th>Loại</th><th>Trạng thái</th><th></th></tr></thead>
         <tbody>

@@ -41,5 +41,8 @@ namespace Repositories.Implementations
 
         public Task UpdateDetailAsync(BudgetDetail detail) =>
             BudgetDAO.Instance.UpdateDetailAsync(_context, detail);
+
+        public Task<List<Budget>> GetForMonthTrackedAsync(int userId, int month, int year) =>
+            BudgetDAO.Instance.GetForMonthTrackedAsync(_context, userId, month, year);
     }
 }

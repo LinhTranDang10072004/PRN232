@@ -39,5 +39,8 @@ namespace ClientMVC.Services
         Task<int> GetUnreadCountAsync();
         Task MarkNotificationReadAsync(int id);
         Task MarkAllNotificationsReadAsync();
+
+        Task<MonthClosingPreviewDto?> GetMonthClosingPreviewAsync(int month, int year);
+        Task<(bool Ok, MonthClosingResultDto? Data, string? Error)> CloseMonthAsync(int month, int year, string? notes = null);
     }
 }

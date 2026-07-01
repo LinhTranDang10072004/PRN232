@@ -1,0 +1,182 @@
+@model ClientMVC.Models.Personal.MonthClosingPreviewDto
+@{
+    ViewData["Title"] = "Chốt sổ tháng";
+    var month = (int)ViewBag.Month;
+    var year = (int)ViewBag.Year;
+}
+
+<div class="page-header">
+    <h2 class="page-title">📒 Chốt sổ tháng @month/@year</h2>
+    <div class="page-actions">
+        <a asp-action="Index" asp-route-month="@(month==1?12:month-1)" asp-route-year="@(month==1?year-1:year)" class="btn btn-outline-secondary btn-sm">‹</a>
+        <a asp-action="Index" asp-route-month="@DateTime.Today.Month" asp-route-year="@DateTime.Today.Year" class="btn btn-outline-primary btn-sm">Tháng này</a>
+        <a asp-action="Index" asp-route-month="@(month==12?1:month+1)" asp-route-year="@(month==12?year+1:year)" class="btn btn-outline-secondary btn-sm">›</a>
+    </div>
+</div>
+
+@if (Model.PreviousMonthNotClosed)
+{
+    <div class="alert alert-warning">
+        Tháng trước chưa được chốt sổ. Bạn vẫn có thể chốt tháng này, nhưng nên chốt các tháng theo thứ tự.
+    </div>
+}
+
+@if (Model.IsClosed)
+{
+    <div class="alert alert-success">
+        ✅ Tháng này đã chốt sổ vào @Model.ClosedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm").
+        Số dư còn lại vẫn nằm trong ví — không cần chuyển thêm.
+    </div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm h-100">
+            <div class="text-muted small">Tổng chi tiêu</div>
+            <div class="fs-4 fw-bold text-danger">@Model.TotalSpent.ToString("N0") đ</div>
+            <div class="small text-muted">@Model.ExpenseCount giao dịch</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm h-100">
+            <div class="text-muted small">Tổng hạn mức budget</div>
+            <div class="fs-4 fw-bold">@Model.TotalBudgetLimit.ToString("N0") đ</div>
+            <div class="small text-muted">@Model.BudgetCount budget</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm h-100">
+            <div class="text-muted small">Tổng dư ngân sách</div>
+            <div class="fs-4 fw-bold text-success">@Model.TotalSurplus.ToString("N0") đ</div>
+            <div class="small text-muted">Giữ lại trong ví</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm h-100">
+            <div class="text-muted small">Tổng vượt ngân sách</div>
+            <div class="fs-4 fw-bold @(Model.TotalOverflow > 0 ? "text-danger" : "")">@Model.TotalOverflow.ToString("N0") đ</div>
+            <div class="small text-muted">Chỉ nợ vượt chuyển sang tháng sau</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Chi tiết budget tháng @month/@year</div>
+            @if (Model.Budgets.Count == 0)
+            {
+                <div class="card-body text-muted">Chưa có budget nào trong tháng này.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Budget</th>
+                                <th class="text-end">Hạn mức</th>
+                                <th class="text-end">Đã chi</th>
+                                <th class="text-end">Còn / Dư</th>
+                                <th class="text-end">Vượt</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var b in Model.Budgets)
+                            {
+                                <tr class="@(b.IsExceeded ? "table-danger" : "")">
+                                    <td>
+                                        <div class="fw-semibold">@b.BudgetName</div>
+                                        <div class="small text-muted">@b.CategoryName</div>
+                                        @if (b.CarryOverDebt > 0)
+                                        {
+                                            <div class="small text-warning">Nợ chuyển: @b.CarryOverDebt.ToString("N0")</div>
+                                        }
+                                    </td>
+                                    <td class="text-end">@b.LimitAmount.ToString("N0")</td>
+                                    <td class="text-end">@b.SpentAmount.ToString("N0")</td>
+                                    <td class="text-end text-success">@b.SurplusAmount.ToString("N0")</td>
+                                    <td class="text-end @(b.OverflowAmount > 0 ? "text-danger fw-bold" : "")">@b.OverflowAmount.ToString("N0")</td>
+                                    <td>
+                                        @if (b.IsExceeded)
+                                        {
+                                            <span class="badge bg-danger">Vượt</span>
+                                        }
+                                        else if (b.SurplusAmount > 0)
+                                        {
+                                            <span class="badge bg-success">Dư</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Vừa đủ</span>
+                                        }
+                                        @if (b.Status == "Closed")
+                                        {
+                                            <span class="badge bg-dark">Đã chốt</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header fw-semibold">Số dư ví hiện tại</div>
+            <ul class="list-group list-group-flush">
+                @foreach (var w in Model.Wallets)
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>@w.WalletName</span>
+                        <strong>@w.Balance.ToString("N0") đ</strong>
+                    </li>
+                }
+                @if (Model.Wallets.Count == 0)
+                {
+                    <li class="list-group-item text-muted">Chưa có ví nào.</li>
+                }
+            </ul>
+        </div>
+
+        @if (!Model.IsClosed)
+        {
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Xác nhận chốt sổ</h5>
+                    <p class="small text-muted">
+                        Sau khi chốt, budget tháng này sẽ đóng lại. Số dư còn lại giữ trong ví.
+                        Chỉ phần <strong>vượt ngân sách</strong> được chuyển sang tháng sau (nợ budget).
+                    </p>
+                    @if (!Model.CanClose)
+                    {
+                        <div class="alert alert-danger py-2 small mb-0">@Model.CannotCloseReason</div>
+                    }
+                    else if (Model.BudgetCount == 0)
+                    {
+                        <div class="alert alert-warning py-2 small mb-0">Cần có ít nhất một budget để chốt sổ.</div>
+                    }
+                    else
+                    {
+                        <form asp-action="Close" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="month" value="@month" />
+                            <input type="hidden" name="year" value="@year" />
+                            <div class="mb-3">
+                                <label class="form-label small">Ghi chú (tuỳ chọn)</label>
+                                <textarea name="notes" class="form-control form-control-sm" rows="2" maxlength="500"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100"
+                                    onclick="return confirm('Chốt sổ tháng @month/@year? Hành động này không thể hoàn tác.');">
+                                📒 Chốt sổ tháng @month/@year
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

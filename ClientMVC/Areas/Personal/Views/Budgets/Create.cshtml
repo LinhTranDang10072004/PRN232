@@ -1,9 +1,11 @@
 @model BudgetFormModel
 @{ ViewData["Title"] = "Tạo budget"; }
 
-<h2>@ViewData["Title"]</h2>
+<div class="page-header">
+    <h2 class="page-title">@ViewData["Title"]</h2>
+</div>
 @if (!string.IsNullOrEmpty(Model.ErrorMessage)) { <div class="alert alert-danger">@Model.ErrorMessage</div> }
-<form asp-action="Create" method="post" class="card p-4 shadow-sm" style="max-width:480px">
+<form asp-action="Create" method="post" class="card p-4 shadow-sm personal-form-card personal-form-sm">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
     <div class="mb-3">

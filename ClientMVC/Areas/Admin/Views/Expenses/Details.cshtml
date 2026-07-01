@@ -4,7 +4,12 @@
     ViewData["Title"] = "Chi tiết phiếu chi";
 }
 
-<h2>Chi tiết phiếu chi #@Model.Id</h2>
+<div class="page-header">
+    <h2 class="page-title">Chi tiết phiếu chi #@Model.Id</h2>
+    <div class="page-actions">
+        <a asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
+    </div>
+</div>
 
 <div class="card shadow-sm mb-3">
     <div class="card-body">

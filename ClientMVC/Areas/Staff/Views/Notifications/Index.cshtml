@@ -1,12 +1,14 @@
 @model List<NotificationDto>
 @{ ViewData["Title"] = "Thông báo"; }
 
-<div class="d-flex justify-content-between mb-3">
-    <h2>🔔 Thông báo</h2>
-    <form asp-action="MarkAllRead" method="post">
-        @Html.AntiForgeryToken()
-        <button class="btn btn-outline-success btn-sm">Đánh dấu tất cả đã đọc</button>
-    </form>
+<div class="page-header">
+    <h2 class="page-title">🔔 Thông báo</h2>
+    <div class="page-actions">
+        <form asp-action="MarkAllRead" method="post">
+            @Html.AntiForgeryToken()
+            <button class="btn btn-outline-primary btn-sm">Đánh dấu tất cả đã đọc</button>
+        </form>
+    </div>
 </div>
 
 <div class="list-group shadow-sm">

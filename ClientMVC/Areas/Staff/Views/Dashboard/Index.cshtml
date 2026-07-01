@@ -3,20 +3,25 @@
     ViewData["Title"] = "Tổng quan";
 }
 
-<h2 class="mb-4">Tổng quan phiếu chi</h2>
+<div class="page-header">
+    <div>
+        <h2 class="page-title">Tổng quan phiếu chi</h2>
+        <p class="page-subtitle">Theo dõi trạng thái phiếu chi của bạn</p>
+    </div>
+</div>
 
-<div class="row g-3 mb-4">
+<div class="row g-3 stats-row">
     <div class="col-md-3">
-        <div class="card stat-card border-0 shadow-sm border-start border-warning border-4">
+        <div class="card stat-card shadow-sm stat-card-accent-warning">
             <div class="card-body">
                 <div class="text-muted small">Chờ duyệt</div>
                 <div class="fs-3 fw-bold text-warning">@Model.PendingCount</div>
-                <div class="small">@Model.TotalPendingAmount.ToString("N0") đ</div>
+                <div class="small text-muted">@Model.TotalPendingAmount.ToString("N0") đ</div>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card stat-card border-0 shadow-sm border-start border-success border-4">
+        <div class="card stat-card shadow-sm stat-card-accent-success">
             <div class="card-body">
                 <div class="text-muted small">Đã duyệt</div>
                 <div class="fs-3 fw-bold text-success">@Model.ApprovedCount</div>
@@ -24,7 +29,7 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card stat-card border-0 shadow-sm border-start border-danger border-4">
+        <div class="card stat-card shadow-sm stat-card-accent-danger">
             <div class="card-body">
                 <div class="text-muted small">Bị từ chối</div>
                 <div class="fs-3 fw-bold text-danger">@Model.RejectedCount</div>
@@ -32,7 +37,7 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card stat-card border-0 shadow-sm">
+        <div class="card stat-card shadow-sm">
             <div class="card-body">
                 <div class="text-muted small">Thông báo chưa đọc</div>
                 <div class="fs-3 fw-bold">@(ViewBag.UnreadCount ?? 0)</div>
@@ -41,7 +46,7 @@
     </div>
 </div>
 
-<div class="d-flex gap-2">
-    <a asp-controller="Expenses" asp-action="Create" class="btn btn-success">➕ Tạo phiếu chi mới</a>
-    <a asp-controller="Expenses" asp-action="Index" class="btn btn-outline-success">📋 Xem danh sách</a>
+<div class="quick-actions">
+    <a asp-controller="Expenses" asp-action="Create" class="btn btn-primary">➕ Tạo phiếu chi mới</a>
+    <a asp-controller="Expenses" asp-action="Index" class="btn btn-outline-primary">📋 Xem danh sách</a>
 </div>

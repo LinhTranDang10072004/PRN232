@@ -9,9 +9,13 @@
     var yearly = ViewBag.Yearly as YearlyReportDto;
 }
 
-<h2 class="mb-3">📈 Báo cáo @month/@year</h2>
+<div class="page-header">
+    <div>
+        <h2 class="page-title">📈 Báo cáo @month/@year</h2>
+    </div>
+</div>
 
-<form method="get" class="row g-2 mb-4" style="max-width:400px">
+<form method="get" class="row g-2 mb-4 personal-filter-form">
     <div class="col-4"><input name="month" value="@month" class="form-control" placeholder="Tháng" /></div>
     <div class="col-4"><input name="year" value="@year" class="form-control" placeholder="Năm" /></div>
     <div class="col-4"><button class="btn btn-primary w-100">Xem</button></div>
@@ -36,18 +40,15 @@
         </div>
     </div>
     <div class="col-12">
-        <div class="card shadow-sm">
-            <div class="card-header">Budget — vượt / còn dư</div>
-            <table class="table mb-0">
-                @foreach (var b in budgetStatus)
-                {
-                    <tr class="@(b.IsExceeded ? "table-danger" : "")">
-                        <td>@b.BudgetName</td>
-                        <td>@b.SpentAmount.ToString("N0") / @b.LimitAmount.ToString("N0")</td>
-                        <td class="@(b.IsExceeded ? "text-danger" : "text-success")">@(b.IsExceeded ? "Vượt" : $"Còn {b.RemainingAmount:N0}")</td>
-                    </tr>
+        <div class="card shadow-sm budget-usage-card">
+            <div class="card-body">
+                @{
+                    ViewBag.Month = month;
+                    ViewBag.Year = year;
+                    ViewBag.ShowBudgetUsageTitle = true;
                 }
-            </table>
+                <partial name="_BudgetUsageReport" model="budgetStatus" />
+            </div>
         </div>
     </div>
     @if (yearly != null)

@@ -4,11 +4,16 @@
     var summary = Model.Summary;
 }
 
-<h2 class="mb-4">Tổng quan tháng @(summary?.Month ?? DateTime.Today.Month)/@(summary?.Year ?? DateTime.Today.Year)</h2>
+<div class="page-header">
+    <div>
+        <h2 class="page-title">Tổng quan tháng @(summary?.Month ?? DateTime.Today.Month)/@(summary?.Year ?? DateTime.Today.Year)</h2>
+        <p class="page-subtitle">Theo dõi chi tiêu và budget của bạn</p>
+    </div>
+</div>
 
-<div class="row g-3 mb-4">
+<div class="row g-3 stats-row">
     <div class="col-md-4">
-        <div class="card stat-card border-0 shadow-sm">
+        <div class="card stat-card shadow-sm">
             <div class="card-body">
                 <div class="text-muted small">Tổng chi tiêu</div>
                 <div class="fs-3 fw-bold text-danger">@((summary?.TotalSpent ?? 0).ToString("N0")) đ</div>
@@ -16,7 +21,7 @@
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card stat-card border-0 shadow-sm">
+        <div class="card stat-card shadow-sm">
             <div class="card-body">
                 <div class="text-muted small">Số khoản chi</div>
                 <div class="fs-3 fw-bold">@(summary?.ExpenseCount ?? 0)</div>
@@ -24,7 +29,7 @@
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card stat-card border-0 shadow-sm">
+        <div class="card stat-card shadow-sm">
             <div class="card-body">
                 <div class="text-muted small">Thông báo chưa đọc</div>
                 <div class="fs-3 fw-bold">@Model.UnreadNotifications</div>
@@ -33,44 +38,38 @@
     </div>
 </div>
 
-<div class="d-flex gap-2 mb-4">
+<div class="quick-actions">
     <a asp-action="Calendar" asp-controller="Expenses" class="btn btn-primary">📅 Mở lịch chi tiêu</a>
     <a asp-action="Create" asp-controller="Expenses" class="btn btn-outline-primary">+ Thêm chi tiêu</a>
 </div>
 
 <div class="row g-3">
-    <div class="col-lg-6">
-        <div class="card shadow-sm">
-            <div class="card-header fw-semibold">Budget tháng này</div>
-            <div class="card-body p-0">
-                @if (!Model.Budgets.Any())
-                {
-                    <p class="p-3 text-muted mb-0">Chưa có budget.</p>
+    <div class="col-12">
+        <div class="card shadow-sm budget-usage-card">
+            <div class="card-body">
+                @{
+                    ViewBag.Month = summary?.Month ?? DateTime.Today.Month;
+                    ViewBag.Year = summary?.Year ?? DateTime.Today.Year;
+                    ViewBag.ShowBudgetUsageTitle = true;
                 }
-                else
+                <partial name="_BudgetUsageReport" model="Model.Budgets" />
+                @if (Model.Budgets.Any())
                 {
-                    <ul class="list-group list-group-flush">
-                        @foreach (var b in Model.Budgets)
-                        {
-                            <li class="list-group-item d-flex justify-content-between">
-                                <span>@b.BudgetName</span>
-                                <span class="@(b.IsExceeded ? "text-danger" : "text-success")">
-                                    @b.SpentAmount.ToString("N0") / @b.LimitAmount.ToString("N0")
-                                </span>
-                            </li>
-                        }
-                    </ul>
+                    <div class="mt-3">
+                        <a asp-area="Personal" asp-controller="Reports" asp-action="Index" class="btn btn-sm btn-outline-primary">Xem báo cáo chi tiết →</a>
+                        <a asp-area="Personal" asp-controller="Budgets" asp-action="Index" class="btn btn-sm btn-outline-secondary">Quản lý budget</a>
+                    </div>
                 }
             </div>
         </div>
     </div>
     <div class="col-lg-6">
         <div class="card shadow-sm">
-            <div class="card-header fw-semibold">Top danh mục</div>
+            <div class="card-header">Top danh mục</div>
             <div class="card-body p-0">
                 @if (!Model.TopCategories.Any())
                 {
-                    <p class="p-3 text-muted mb-0">Chưa có dữ liệu.</p>
+                    <p class="empty-state mb-0">Chưa có dữ liệu.</p>
                 }
                 else
                 {

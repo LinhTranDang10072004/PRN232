@@ -7,14 +7,14 @@
     var headers = CalendarHelper.GetWeekdayHeaders();
 }
 
-<div class="calendar-header d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+<div class="calendar-header page-header">
     <div>
-        <h2 class="mb-0">📅 @Model.MonthLabel</h2>
-        <p class="text-muted mb-0">
+        <h2 class="page-title">📅 @Model.MonthLabel</h2>
+        <p class="page-subtitle">
             @Model.ExpenseCount khoản · Tổng <strong class="text-danger">@Model.MonthTotal.ToString("N0") đ</strong>
         </p>
     </div>
-    <div class="d-flex gap-2 align-items-center">
+    <div class="page-actions">
         <a asp-action="Calendar" asp-route-year="@prevY" asp-route-month="@prevM" class="btn btn-outline-secondary">‹ Tháng trước</a>
         <a asp-action="Calendar" asp-route-year="@DateTime.Today.Year" asp-route-month="@DateTime.Today.Month" class="btn btn-outline-primary btn-sm">Hôm nay</a>
         <a asp-action="Calendar" asp-route-year="@nextY" asp-route-month="@nextM" class="btn btn-outline-secondary">Tháng sau ›</a>

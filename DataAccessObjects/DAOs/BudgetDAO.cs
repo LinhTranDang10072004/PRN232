@@ -89,5 +89,13 @@ namespace DataAccessObjects.DAOs
             context.BudgetDetails.Update(detail);
             await context.SaveChangesAsync();
         }
+
+        public async Task<List<Budget>> GetForMonthTrackedAsync(
+            ExpenseDbContext context, int userId, int month, int year) =>
+            await context.Budgets
+                .Include(b => b.Category)
+                .Include(b => b.Details)
+                .Where(b => b.UserId == userId && b.Month == month && b.Year == year)
+                .ToListAsync();
     }
 }
