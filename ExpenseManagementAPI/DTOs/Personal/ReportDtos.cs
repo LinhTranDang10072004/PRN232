@@ -32,6 +32,7 @@ namespace ExpenseManagementAPI.DTOs.Personal
         public int Month { get; set; }
         public int Year { get; set; }
         public decimal LimitAmount { get; set; }
+        public decimal CarryOverDebt { get; set; }
         public decimal SpentAmount { get; set; }
         public decimal RemainingAmount { get; set; }
         public bool IsExceeded { get; set; }
@@ -50,6 +51,7 @@ namespace ExpenseManagementAPI.DTOs.Personal
         public string Title { get; set; } = null!;
         public string? Content { get; set; }
         public bool IsRead { get; set; }
+        public string Severity { get; set; } = "info";
         public DateTime CreatedAt { get; set; }
     }
 }

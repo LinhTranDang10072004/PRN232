@@ -77,9 +77,11 @@ namespace ExpenseManagementAPI.Services.Implement
                 Month = b.Month ?? month,
                 Year = b.Year ?? year,
                 LimitAmount = b.Details.Sum(d => d.LimitAmount),
+                CarryOverDebt = b.Details.Sum(d => d.CarryOverDebt),
                 SpentAmount = b.Details.Sum(d => d.CurrentAmount),
-                RemainingAmount = b.Details.Sum(d => d.LimitAmount) - b.Details.Sum(d => d.CurrentAmount),
-                IsExceeded = b.Details.Sum(d => d.CurrentAmount) > b.Details.Sum(d => d.LimitAmount)
+                RemainingAmount = b.Details.Sum(d => d.LimitAmount - d.CarryOverDebt - d.CurrentAmount),
+                IsExceeded = b.Details.Sum(d => d.CurrentAmount) >
+                    b.Details.Sum(d => d.LimitAmount - d.CarryOverDebt)
             }).ToListAsync();
         }
 

@@ -23,6 +23,7 @@ namespace ClientMVC.Areas.Personal.Controllers
         public async Task<IActionResult> Create()
         {
             await LoadCategoriesAsync();
+            await LoadWalletsAsync();
             return View(new BudgetFormModel());
         }
 
@@ -33,6 +34,7 @@ namespace ClientMVC.Areas.Personal.Controllers
             if (!ModelState.IsValid)
             {
                 await LoadCategoriesAsync();
+                await LoadWalletsAsync();
                 return View(model);
             }
 
@@ -41,6 +43,7 @@ namespace ClientMVC.Areas.Personal.Controllers
             {
                 model.ErrorMessage = error;
                 await LoadCategoriesAsync();
+                await LoadWalletsAsync();
                 return View(model);
             }
 
@@ -82,6 +85,14 @@ namespace ClientMVC.Areas.Personal.Controllers
             var categories = await _api.GetCategoriesAsync();
             ViewBag.Categories = new SelectList(
                 categories.Where(c => c.Status == BusinessObjects.Enums.CategoryStatus.Active),
+                "Id", "Name");
+        }
+
+        private async Task LoadWalletsAsync()
+        {
+            var wallets = await _api.GetWalletsAsync();
+            ViewBag.Wallets = new SelectList(
+                wallets.Where(w => w.Status != "Inactive"),
                 "Id", "Name");
         }
     }

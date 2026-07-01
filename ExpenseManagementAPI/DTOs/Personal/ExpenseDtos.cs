@@ -24,7 +24,7 @@ namespace ExpenseManagementAPI.DTOs.Personal
         [Required]
         public int WalletId { get; set; }
 
-        /// <summary>Tùy chọn — nếu null thì tự gắn theo Category + tháng/năm ExpenseDate.</summary>
+        /// <summary>Tùy chọn — nếu null thì tự gắn theo Category + Ví + tháng/năm ExpenseDate.</summary>
         public int? BudgetDetailId { get; set; }
     }
 
@@ -42,5 +42,7 @@ namespace ExpenseManagementAPI.DTOs.Personal
         public string? WalletName { get; set; }
         public int? BudgetDetailId { get; set; }
         public DateTime CreatedAt { get; set; }
+        public bool BudgetExceeded { get; set; }
+        public decimal BudgetOverflowAmount { get; set; }
     }
 }

@@ -11,6 +11,12 @@
         <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select"></select>
         <span asp-validation-for="CategoryId" class="text-danger"></span>
     </div>
+    <div class="mb-3">
+        <label asp-for="WalletId" class="form-label"></label>
+        <select asp-for="WalletId" asp-items="ViewBag.Wallets" class="form-select"></select>
+        <span asp-validation-for="WalletId" class="text-danger"></span>
+        <div class="form-text">Ví dùng để theo dõi chi tiêu trong kế hoạch này. Tạo budget không trừ số dư ví.</div>
+    </div>
     <div class="row">
         <div class="col-6 mb-3">
             <label asp-for="Month" class="form-label"></label>

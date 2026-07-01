@@ -12,11 +12,25 @@
 <div class="list-group shadow-sm">
 @foreach (var n in Model)
 {
-    <div class="list-group-item @(n.IsRead ? "" : "list-group-item-warning")">
-        <div class="d-flex justify-content-between">
+    var itemClass = n.Severity switch
+    {
+        "danger" => "list-group-item-danger",
+        "warning" => "list-group-item-warning",
+        _ => n.IsRead ? "" : "list-group-item-light border-start border-primary border-3"
+    };
+    var titleClass = n.Severity == "danger" ? "text-danger" : n.Severity == "warning" ? "text-warning-emphasis" : "";
+    <div class="list-group-item @itemClass">
+        <div class="d-flex justify-content-between align-items-start gap-2">
             <div>
-                <strong>@n.Title</strong>
-                @if (!string.IsNullOrEmpty(n.Content)) { <div class="small text-muted">@n.Content</div> }
+                <strong class="@titleClass">@n.Title</strong>
+                @if (n.Severity == "danger")
+                {
+                    <span class="badge bg-danger ms-1">Vượt budget</span>
+                }
+                @if (!string.IsNullOrEmpty(n.Content))
+                {
+                    <div class="small @(n.Severity == "danger" ? "text-danger" : "text-muted") mt-1">@n.Content</div>
+                }
                 <div class="small text-muted">@n.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
             </div>
             @if (!n.IsRead)
@@ -31,3 +45,8 @@
     </div>
 }
 </div>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">Chưa có thông báo.</p>
+}

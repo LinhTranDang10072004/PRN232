@@ -52,7 +52,7 @@ namespace ClientMVC.Areas.Personal.Controllers
                 return View(model);
             }
 
-            var (ok, _, error) = await _api.CreateExpenseAsync(model);
+            var (ok, data, error) = await _api.CreateExpenseAsync(model);
             if (!ok)
             {
                 model.ErrorMessage = error;
@@ -60,7 +60,14 @@ namespace ClientMVC.Areas.Personal.Controllers
                 return View(model);
             }
 
-            SetSuccess("Đã thêm khoản chi.");
+            if (data?.BudgetExceeded == true)
+            {
+                SetWarning($"🔴 Đã thêm khoản chi nhưng VƯỢT NGÂN SÁCH! Vượt {data.BudgetOverflowAmount:N0} so với hạn mức tháng này.");
+            }
+            else
+            {
+                SetSuccess("Đã thêm khoản chi.");
+            }
             return RedirectToAction(nameof(Calendar), new { year = model.ExpenseDate.Year, month = model.ExpenseDate.Month, day = model.ExpenseDate.Day });
         }
 
@@ -93,7 +100,7 @@ namespace ClientMVC.Areas.Personal.Controllers
                 return View(model);
             }
 
-            var (ok, _, error) = await _api.UpdateExpenseAsync(id, model);
+            var (ok, data, error) = await _api.UpdateExpenseAsync(id, model);
             if (!ok)
             {
                 model.ErrorMessage = error;
@@ -101,7 +108,14 @@ namespace ClientMVC.Areas.Personal.Controllers
                 return View(model);
             }
 
-            SetSuccess("Đã cập nhật khoản chi.");
+            if (data?.BudgetExceeded == true)
+            {
+                SetWarning($"🔴 Đã cập nhật nhưng VƯỢT NGÂN SÁCH! Vượt {data.BudgetOverflowAmount:N0} so với hạn mức tháng này.");
+            }
+            else
+            {
+                SetSuccess("Đã cập nhật khoản chi.");
+            }
             return RedirectToAction(nameof(Calendar), new { year = model.ExpenseDate.Year, month = model.ExpenseDate.Month, day = model.ExpenseDate.Day });
         }
 
@@ -127,7 +141,9 @@ namespace ClientMVC.Areas.Personal.Controllers
                 categories.Where(c => c.Status == CategoryStatus.Active),
                 "Id", "Name");
 
-            ViewBag.Wallets = new SelectList(wallets, "Id", "Name");
+            ViewBag.Wallets = new SelectList(
+                wallets.Where(w => w.Status != "Inactive"),
+                "Id", "Name");
         }
 
         private async Task LoadFilterLookupsAsync()

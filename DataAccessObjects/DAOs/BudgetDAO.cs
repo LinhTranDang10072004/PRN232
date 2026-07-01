@@ -47,6 +47,17 @@ namespace DataAccessObjects.DAOs
                     b.Month == month &&
                     b.Year == year);
 
+        public async Task<Budget?> FindForMonthAndWalletAsync(
+            ExpenseDbContext context, int userId, int categoryId, int walletId, int month, int year) =>
+            await context.Budgets
+                .Include(b => b.Details)
+                .FirstOrDefaultAsync(b =>
+                    b.UserId == userId &&
+                    b.CategoryId == categoryId &&
+                    b.WalletId == walletId &&
+                    b.Month == month &&
+                    b.Year == year);
+
         public async Task<bool> ExistsForMonthAsync(
             ExpenseDbContext context, int userId, int categoryId, int month, int year, int? excludeId = null) =>
             await context.Budgets.AnyAsync(b =>

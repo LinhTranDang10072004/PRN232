@@ -106,7 +106,9 @@ namespace ExpenseManagementAPI.Services.Implement
                     await NotifyBudgetAsync(userId, expense.BudgetDetailId.Value);
 
                 var created = await _expenseRepository.GetByIdForPersonalUserAsync(userId, expense.Id);
-                return (true, Map(created!), null);
+                var response = Map(created!);
+                await EnrichWithBudgetStatusAsync(response);
+                return (true, response, null);
             }
             catch
             {
@@ -132,7 +134,6 @@ namespace ExpenseManagementAPI.Services.Implement
                     return (false, null, "Không tìm thấy khoản chi.");
                 }
 
-                // Hoàn tác hiệu ứng cũ (ví + budget)
                 await ReverseEffectsAsync(userId, expense);
 
                 expense.Title = request.Title.Trim();
@@ -164,7 +165,9 @@ namespace ExpenseManagementAPI.Services.Implement
                     await NotifyBudgetAsync(userId, expense.BudgetDetailId.Value);
 
                 var updated = await _expenseRepository.GetByIdForPersonalUserAsync(userId, id);
-                return (true, Map(updated!), null);
+                var response = Map(updated!);
+                await EnrichWithBudgetStatusAsync(response);
+                return (true, response, null);
             }
             catch
             {
@@ -219,9 +222,20 @@ namespace ExpenseManagementAPI.Services.Implement
                 if (detail?.Budget == null || detail.Budget.UserId != userId)
                     return (false, "BudgetDetail không hợp lệ.");
 
+                if (detail.Budget.WalletId != request.WalletId)
+                    return (false, "Ví không khớp với kế hoạch ngân sách tháng này.");
+
                 if (!PersonalExpenseRules.ExpenseDateMatchesBudget(
                         request.ExpenseDate, detail.Budget.Month, detail.Budget.Year))
                     return (false, "Ngày chi không khớp tháng/năm của budget.");
+            }
+            else
+            {
+                var budget = await _budgetRepository.FindForMonthAndWalletAsync(
+                    userId, request.CategoryId, request.WalletId,
+                    request.ExpenseDate.Month, request.ExpenseDate.Year);
+                if (budget?.Details.FirstOrDefault() == null)
+                    return (false, "Chưa có kế hoạch ngân sách cho danh mục, ví và tháng này. Vui lòng tạo budget trước.");
             }
 
             return (true, null);
@@ -231,51 +245,44 @@ namespace ExpenseManagementAPI.Services.Implement
             int userId, Expense expense, ExpenseRequest request)
         {
             BudgetDetail? detail;
+            Budget? budget;
 
             if (request.BudgetDetailId.HasValue)
             {
                 detail = await _budgetRepository.GetDetailByIdAsync(request.BudgetDetailId.Value);
-                if (detail?.Budget == null || detail.Budget.UserId != userId)
+                budget = detail?.Budget;
+                if (budget == null || budget.UserId != userId)
                     return (false, "BudgetDetail không hợp lệ.");
+
+                if (budget.WalletId != request.WalletId)
+                    return (false, "Ví không khớp với kế hoạch ngân sách tháng này.");
             }
             else
             {
-                if (!expense.CategoryId.HasValue)
-                    return (true, null);
-
-                var budget = await _budgetRepository.FindForMonthAsync(
-                    userId, expense.CategoryId.Value, request.ExpenseDate.Month, request.ExpenseDate.Year);
-
+                budget = await _budgetRepository.FindForMonthAndWalletAsync(
+                    userId, expense.CategoryId!.Value, request.WalletId,
+                    request.ExpenseDate.Month, request.ExpenseDate.Year);
                 detail = budget?.Details.FirstOrDefault();
                 if (detail == null)
-                    return (true, null);
+                    return (false, "Chưa có kế hoạch ngân sách cho danh mục, ví và tháng này. Vui lòng tạo budget trước.");
             }
 
             if (!PersonalExpenseRules.ExpenseDateMatchesBudget(
-                    request.ExpenseDate, detail.Budget?.Month, detail.Budget?.Year))
+                    request.ExpenseDate, budget!.Month, budget.Year))
                 return (false, "Ngày chi không khớp tháng/năm của budget.");
 
-            detail.CurrentAmount += expense.Amount;
+            detail!.CurrentAmount += expense.Amount;
             detail.UpdatedAt = DateTime.UtcNow;
             expense.BudgetDetailId = detail.Id;
             await _budgetRepository.UpdateDetailAsync(detail);
+
+            await ApplyOverflowToNextMonthAsync(userId, detail, budget);
             return (true, null);
         }
 
         private async Task ReverseEffectsAsync(int userId, Expense expense)
         {
-            if (expense.BudgetDetailId.HasValue)
-            {
-                var detail = await _budgetRepository.GetDetailByIdAsync(expense.BudgetDetailId.Value);
-                if (detail != null)
-                {
-                    detail.CurrentAmount -= expense.Amount;
-                    if (detail.CurrentAmount < 0)
-                        detail.CurrentAmount = 0;
-                    detail.UpdatedAt = DateTime.UtcNow;
-                    await _budgetRepository.UpdateDetailAsync(detail);
-                }
-            }
+            await ReverseBudgetEffectsAsync(userId, expense);
 
             if (expense.WalletId.HasValue)
                 await RefundWalletAsync(userId, expense.WalletId.Value, expense.Amount);
@@ -306,6 +313,103 @@ namespace ExpenseManagementAPI.Services.Implement
             await _walletRepository.UpdateAsync(wallet);
         }
 
+        private async Task ReverseBudgetEffectsAsync(int userId, Expense expense)
+        {
+            if (!expense.BudgetDetailId.HasValue)
+                return;
+
+            var detail = await _budgetRepository.GetDetailByIdAsync(expense.BudgetDetailId.Value);
+            if (detail?.Budget == null)
+                return;
+
+            detail.CurrentAmount -= expense.Amount;
+            if (detail.CurrentAmount < 0)
+                detail.CurrentAmount = 0;
+            detail.UpdatedAt = DateTime.UtcNow;
+            await _budgetRepository.UpdateDetailAsync(detail);
+
+            await ReverseOverflowForwardingAsync(userId, detail, detail.Budget);
+        }
+
+        private async Task ApplyOverflowToNextMonthAsync(int userId, BudgetDetail detail, Budget budget)
+        {
+            if (!budget.CategoryId.HasValue || !budget.Month.HasValue || !budget.Year.HasValue)
+                return;
+
+            var totalOverflow = PersonalBudgetRules.OverflowAmount(detail.LimitAmount, detail.CurrentAmount);
+            var newOverflow = totalOverflow - detail.ForwardedOverflow;
+            if (newOverflow <= 0)
+                return;
+
+            var (nextMonth, nextYear) = PersonalBudgetRules.NextMonth(budget.Month.Value, budget.Year.Value);
+            var nextBudget = budget.WalletId.HasValue
+                ? await _budgetRepository.FindForMonthAndWalletAsync(
+                    userId, budget.CategoryId.Value, budget.WalletId.Value, nextMonth, nextYear)
+                : await _budgetRepository.FindForMonthAsync(
+                    userId, budget.CategoryId.Value, nextMonth, nextYear);
+
+            if (nextBudget != null)
+            {
+                var nextDetail = nextBudget.Details.FirstOrDefault();
+                if (nextDetail != null)
+                {
+                    nextDetail.CarryOverDebt += newOverflow;
+                    nextDetail.UpdatedAt = DateTime.UtcNow;
+                    await _budgetRepository.UpdateDetailAsync(nextDetail);
+
+                    await _notificationService.NotifyAsync(userId,
+                        "🔴 Chi vượt ngân sách — trừ tháng sau",
+                        $"Phần vượt {newOverflow:N0} đã trừ vào ngân sách tháng {nextMonth}/{nextYear} ({nextBudget.Name}).",
+                        "danger");
+                }
+            }
+            else
+            {
+                await _notificationService.NotifyAsync(userId,
+                    "🔴 Chi vượt ngân sách",
+                    $"Bạn đã vượt ngân sách \"{budget.Name}\". Phần vượt {newOverflow:N0} sẽ trừ vào tháng sau khi tạo budget.",
+                    "danger");
+            }
+
+            detail.ForwardedOverflow += newOverflow;
+            detail.UpdatedAt = DateTime.UtcNow;
+            await _budgetRepository.UpdateDetailAsync(detail);
+        }
+
+        private async Task ReverseOverflowForwardingAsync(int userId, BudgetDetail detail, Budget budget)
+        {
+            if (!budget.CategoryId.HasValue || !budget.Month.HasValue || !budget.Year.HasValue)
+                return;
+
+            var totalOverflow = PersonalBudgetRules.OverflowAmount(detail.LimitAmount, detail.CurrentAmount);
+            var excessForwarded = detail.ForwardedOverflow - totalOverflow;
+            if (excessForwarded <= 0)
+                return;
+
+            var (nextMonth, nextYear) = PersonalBudgetRules.NextMonth(budget.Month.Value, budget.Year.Value);
+            var nextBudget = budget.WalletId.HasValue
+                ? await _budgetRepository.FindForMonthAndWalletAsync(
+                    userId, budget.CategoryId.Value, budget.WalletId.Value, nextMonth, nextYear)
+                : await _budgetRepository.FindForMonthAsync(
+                    userId, budget.CategoryId.Value, nextMonth, nextYear);
+            var nextDetail = nextBudget?.Details.FirstOrDefault();
+
+            if (nextDetail != null)
+            {
+                nextDetail.CarryOverDebt -= excessForwarded;
+                if (nextDetail.CarryOverDebt < 0)
+                    nextDetail.CarryOverDebt = 0;
+                nextDetail.UpdatedAt = DateTime.UtcNow;
+                await _budgetRepository.UpdateDetailAsync(nextDetail);
+            }
+
+            detail.ForwardedOverflow -= excessForwarded;
+            if (detail.ForwardedOverflow < 0)
+                detail.ForwardedOverflow = 0;
+            detail.UpdatedAt = DateTime.UtcNow;
+            await _budgetRepository.UpdateDetailAsync(detail);
+        }
+
         private async Task NotifyBudgetAsync(int userId, int budgetDetailId)
         {
             var detail = await _budgetRepository.GetDetailByIdAsync(budgetDetailId);
@@ -317,7 +421,23 @@ namespace ExpenseManagementAPI.Services.Implement
                 detail.Budget.Id,
                 detail.Budget.Name,
                 detail.LimitAmount,
+                detail.CarryOverDebt,
                 detail.CurrentAmount);
+        }
+
+        private async Task EnrichWithBudgetStatusAsync(ExpenseResponse response)
+        {
+            if (!response.BudgetDetailId.HasValue)
+                return;
+
+            var detail = await _budgetRepository.GetDetailByIdAsync(response.BudgetDetailId.Value);
+            if (detail == null)
+                return;
+
+            response.BudgetExceeded = PersonalBudgetRules.IsExceeded(
+                detail.LimitAmount, detail.CarryOverDebt, detail.CurrentAmount);
+            response.BudgetOverflowAmount = PersonalBudgetRules.OverflowAmount(
+                detail.LimitAmount, detail.CurrentAmount);
         }
 
         private static ExpenseResponse Map(Expense e) => new()

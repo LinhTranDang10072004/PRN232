@@ -28,11 +28,16 @@ namespace BusinessObjects.Models
 
         public int? CategoryId { get; set; }
 
+        public int? WalletId { get; set; }
+
         [ForeignKey(nameof(UserId))]
         public User? User { get; set; }
 
         [ForeignKey(nameof(CategoryId))]
         public Category? Category { get; set; }
+
+        [ForeignKey(nameof(WalletId))]
+        public Wallet? Wallet { get; set; }
 
         public ICollection<BudgetDetail> Details { get; set; } = new List<BudgetDetail>();
     }

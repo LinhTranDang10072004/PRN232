@@ -39,6 +39,7 @@ namespace ClientMVC.Models.Personal
         public int? CategoryId { get; set; }
         public string? CategoryName { get; set; }
         public decimal LimitAmount { get; set; }
+        public decimal CarryOverDebt { get; set; }
         public decimal SpentAmount { get; set; }
         public decimal RemainingAmount { get; set; }
         public bool IsExceeded { get; set; }
@@ -57,6 +58,8 @@ namespace ClientMVC.Models.Personal
         public int? WalletId { get; set; }
         public string? WalletName { get; set; }
         public DateTime CreatedAt { get; set; }
+        public bool BudgetExceeded { get; set; }
+        public decimal BudgetOverflowAmount { get; set; }
     }
 
     public class MonthlySummaryDto
@@ -83,6 +86,7 @@ namespace ClientMVC.Models.Personal
         public int Month { get; set; }
         public int Year { get; set; }
         public decimal LimitAmount { get; set; }
+        public decimal CarryOverDebt { get; set; }
         public decimal SpentAmount { get; set; }
         public decimal RemainingAmount { get; set; }
         public bool IsExceeded { get; set; }
@@ -101,6 +105,7 @@ namespace ClientMVC.Models.Personal
         public string Title { get; set; } = null!;
         public string? Content { get; set; }
         public bool IsRead { get; set; }
+        public string Severity { get; set; } = "info";
         public DateTime CreatedAt { get; set; }
     }
 }

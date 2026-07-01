@@ -97,6 +97,7 @@ namespace ClientMVC.Services
             var response = await _http.PostAsJsonAsync("api/personal/budgets", new
             {
                 categoryId = model.CategoryId,
+                walletId = model.WalletId,
                 month = model.Month,
                 year = model.Year,
                 limitAmount = model.LimitAmount,

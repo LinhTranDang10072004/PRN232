@@ -18,6 +18,7 @@ namespace ExpenseManagementAPI.Services.Implement
                 Title = n.Title,
                 Content = n.Content,
                 IsRead = n.IsRead,
+                Severity = n.Severity,
                 CreatedAt = n.CreatedAt
             });
 

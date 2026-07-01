@@ -61,6 +61,9 @@ namespace ExpenseManagementAPI.Validators
             RuleFor(x => x.CategoryId)
                 .GreaterThan(0).WithMessage("Vui lòng chọn danh mục");
 
+            RuleFor(x => x.WalletId)
+                .GreaterThan(0).WithMessage("Vui lòng chọn ví");
+
             RuleFor(x => x.Month)
                 .InclusiveBetween(1, 12).WithMessage("Tháng phải từ 1 đến 12");
 

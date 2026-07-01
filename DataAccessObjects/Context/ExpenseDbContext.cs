@@ -86,6 +86,7 @@ namespace DataAccessObjects.Context
             modelBuilder.Entity<Notification>(entity =>
             {
                 entity.Property(n => n.Title).HasMaxLength(255);
+                entity.Property(n => n.Severity).HasMaxLength(20);
 
                 entity.HasOne(n => n.User)
                     .WithMany(u => u.Notifications)
@@ -120,12 +121,19 @@ namespace DataAccessObjects.Context
                     .WithMany(c => c.Budgets)
                     .HasForeignKey(b => b.CategoryId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(b => b.Wallet)
+                    .WithMany()
+                    .HasForeignKey(b => b.WalletId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<BudgetDetail>(entity =>
             {
                 entity.Property(d => d.LimitAmount).HasColumnType("decimal(18,2)");
                 entity.Property(d => d.CurrentAmount).HasColumnType("decimal(18,2)");
+                entity.Property(d => d.CarryOverDebt).HasColumnType("decimal(18,2)");
+                entity.Property(d => d.ForwardedOverflow).HasColumnType("decimal(18,2)");
                 entity.Property(d => d.Status).HasMaxLength(50);
 
                 entity.HasOne(d => d.Budget)

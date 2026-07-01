@@ -7,6 +7,9 @@ namespace ExpenseManagementAPI.DTOs.Personal
         [Required]
         public int CategoryId { get; set; }
 
+        [Required]
+        public int WalletId { get; set; }
+
         [Range(1, 12)]
         public int Month { get; set; }
 
@@ -36,7 +39,9 @@ namespace ExpenseManagementAPI.DTOs.Personal
         public int? Year { get; set; }
         public int? CategoryId { get; set; }
         public string? CategoryName { get; set; }
+        public int? WalletId { get; set; }
         public decimal LimitAmount { get; set; }
+        public decimal CarryOverDebt { get; set; }
         public decimal SpentAmount { get; set; }
         public decimal RemainingAmount { get; set; }
         public bool IsExceeded { get; set; }

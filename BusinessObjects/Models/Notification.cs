@@ -19,6 +19,10 @@ namespace BusinessObjects.Models
 
         public bool IsRead { get; set; }
 
+        /// <summary>info | warning | danger</summary>
+        [StringLength(20)]
+        public string Severity { get; set; } = "info";
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [ForeignKey(nameof(UserId))]

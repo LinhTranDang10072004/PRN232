@@ -77,6 +77,11 @@ namespace ClientMVC.Models.Personal
         [Display(Name = "Danh mục")]
         public int CategoryId { get; set; }
 
+        [Required(ErrorMessage = "Vui lòng chọn ví")]
+        [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn ví")]
+        [Display(Name = "Ví theo dõi")]
+        public int WalletId { get; set; }
+
         [Range(1, 12, ErrorMessage = "Tháng phải từ 1 đến 12")]
         [Display(Name = "Tháng")]
         public int Month { get; set; } = DateTime.Today.Month;

@@ -23,6 +23,10 @@ namespace Repositories.Implementations
         public Task<Budget?> FindForMonthAsync(int userId, int categoryId, int month, int year) =>
             BudgetDAO.Instance.FindForMonthAsync(_context, userId, categoryId, month, year);
 
+        public Task<Budget?> FindForMonthAndWalletAsync(
+            int userId, int categoryId, int walletId, int month, int year) =>
+            BudgetDAO.Instance.FindForMonthAndWalletAsync(_context, userId, categoryId, walletId, month, year);
+
         public Task<bool> ExistsForMonthAsync(int userId, int categoryId, int month, int year, int? excludeId = null) =>
             BudgetDAO.Instance.ExistsForMonthAsync(_context, userId, categoryId, month, year, excludeId);
 

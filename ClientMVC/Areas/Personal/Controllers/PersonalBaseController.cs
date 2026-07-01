@@ -9,5 +9,6 @@ namespace ClientMVC.Areas.Personal.Controllers
     {
         protected void SetError(string message) => TempData["Error"] = message;
         protected void SetSuccess(string message) => TempData["Success"] = message;
+        protected void SetWarning(string message) => TempData["Warning"] = message;
     }
 }

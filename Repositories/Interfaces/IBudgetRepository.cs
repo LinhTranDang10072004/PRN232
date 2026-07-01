@@ -7,6 +7,7 @@ namespace Repositories.Interfaces
         IQueryable<Budget> GetForPersonalUser(int userId);
         Task<Budget?> GetByIdForUserAsync(int userId, int id);
         Task<Budget?> FindForMonthAsync(int userId, int categoryId, int month, int year);
+        Task<Budget?> FindForMonthAndWalletAsync(int userId, int categoryId, int walletId, int month, int year);
         Task<bool> ExistsForMonthAsync(int userId, int categoryId, int month, int year, int? excludeId = null);
         Task AddAsync(Budget budget);
         Task UpdateAsync(Budget budget);
